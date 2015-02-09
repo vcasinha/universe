@@ -52,7 +52,7 @@
 				this.ctx.trigger('sm.ready');
 			}.bind(that));
 			
-			this.currentState.stop();
+			this.currentState.stop(this.ctx);
 		}
 		else{
 			//console.log('sm.ready');
@@ -78,12 +78,12 @@
 		
 		this.currentStateName = state_name;
 		this.currentState = new this.states[state_name](this.ctx);
-		this.currentState.start();
+		this.currentState.start(this.ctx);
 	}
 	
 	Engine.StateMachine.prototype.update = function(){
 		if(this.currentState){
-			this.currentState.update();
+			this.currentState.update(this.ctx);
 		}
 	};
 	

@@ -4,6 +4,7 @@
 		var that = this;
 		var renderer = null;
 		var stage = null;
+		this.assets = new OO();
 		
 		//init the world
 		function init(settings){
@@ -12,13 +13,10 @@
 			this.settings = settings;
 			
 		    // create an new instance of a pixi stage
-		    this.stage = stage = new PIXI.Stage(settings.background || 0x000000, true);
+		    this.stage = new PIXI.Stage(settings.background || 0x000000, true);
 		 
 		    // create a renderer instance.
-		    this.renderer = renderer = PIXI.autoDetectRenderer(settings.width, settings.height);
-		    if(settings.element === undefined){
-			    settings.element = $('body');
-		    }
+		    this.renderer = PIXI.autoDetectRenderer(settings.width, settings.height);
 		    
 		    requestAnimFrame(update.bind(this));
 		}
@@ -29,13 +27,14 @@
 
 			ctx.trigger('display.update', [time]);
 			
-			renderer.render(stage);
+			this.renderer.render(this.stage);
 		}
 		
 		ctx.on('init', init, this);
 	};
-	
-	DisplayManager.prototype.resize = function(width, height){
+
+	var prototype = {};
+	prototype.resize = function(width, height){
 	    this.width = width;
 	    this.height = height;
 	    
@@ -46,7 +45,18 @@
 		}
 	};
 	
-	DisplayManager.prototype.requestFullScreen = function(){
+	prototype.texture = function(name){
+		var location = this.get(name).location;
+		console.log("display.texture", name, location);
+		return PIXI.Texture.fromImage(location);
+	};
+	
+	prototype.sprite = function(name){
+		var texture = this.texture(name);
+		return new PIXI.Sprite(texture);
+	}
+	
+	prototype.requestFullScreen = function(){
 		console.log("display.requestFullScreen", this);
 		if(renderer.view.webkitRequestFullScreen) {
 			el.webkitRequestFullScreen();
@@ -56,9 +66,10 @@
 		}
 	};
 	
-	DisplayManager.prototype.add = function(child){
-		return stage.addChild(child);
+	prototype.add = function(child){
+		return this.stage.addChild(child);
 	};
 	
-	window.Engine.DisplayManager = DisplayManager;
+	window.Engine.DisplayManager = Oo.createClass(DisplayManager, prototype, [OO]);
+	
 })(Oo, PIXI);

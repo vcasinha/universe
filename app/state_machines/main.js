@@ -1,47 +1,46 @@
 (function(Engine, App){
 	var StateMachine = function(ctx){
 		var boot_state = {
-			start: function(){
+			start: function(ctx){
 				console.log("boot.start");
 				
 				var assets = [
-					
 					{name: 'music', location: 'audio/bach.ogg', type: 'audio'},
-					{name: 'texture', location: 'images/baddie.png', type: 'image'},
+					{name: 'texture', location: 'images/diamond.png', type: 'image'},
 				];
 
-				this.ctx.loader.queueList(assets);
-				this.ctx.loader.load();
-				this.ctx.trigger('sm.state.start');
+				ctx.loader.queueList(assets);
+				ctx.loader.load();
+				ctx.trigger('sm.state.start');
 				
-				this.ctx.onOnce('assets.loaded', function(){
+				ctx.onOnce('assets.loaded', function(){
 					this.ctx.sm.start('splash');
 				}.bind(this))
 			},
-			stop: function(){
+			stop: function(ctx){
 				console.log("boot.stop");
-				this.ctx.trigger('sm.state.stop');
+				ctx.trigger('sm.state.stop');
 			},
-			update: function(){
-				this.ctx.trigger('sm.state.update');
+			update: function(ctx){
+				ctx.trigger('sm.state.update');
 				//console.log("boot.update");
 			}
 		};
 
 		var splash_state = {
-			start: function(){
-				this.stage_ctx = this.ctx.clone();
+			start: function(ctx){
 				console.log("splash.start");
-				this.actor = new Engine.Entity(this.stage_ctx);
-				this.ctx.audio.assets.get('music').play();
+				ctx.audio.get('music').play();
+				ctx.actor = new Engine.Actor(ctx);
+				
 			},
-			stop: function(){
+			stop: function(ctx){
 				console.log("boot.stop");
-				this.ctx.trigger('sm.state.stop');
+				ctx.trigger('sm.state.stop');
 			},
-			update: function(){
-				this.actor.update();
-				this.ctx.trigger('sm.state.update');
+			update: function(ctx){
+				//this.actor.update();
+				ctx.trigger('sm.state.update');
 				//console.log("splash.update");
 			}
 		};
