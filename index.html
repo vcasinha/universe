@@ -1,0 +1,44 @@
+<!doctype html> 
+<html lang="en"> 
+	<head> 
+		<meta charset="UTF-8" />
+	    <title>Phaser template</title>
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+			}
+			
+			#stage{
+				margin-top: 10px;
+				margin-right: auto;
+				margin-left: auto;
+				border: 2px solid #444444;
+				width: 70%;
+				height: 600px;
+			}
+		</style>
+		<script src="lib/pixi.min.js"></script>
+		<script src="lib/jquery.min.js"></script>
+		<script src="lib/jquery.binarytransport.js"></script>
+		<script src="lib/oo.js"></script>
+		<script src="lib/oo.events.js"></script>
+		
+		<script src="engine/engine.js"></script>
+		<script src="engine/display.js"></script>
+		<script src="engine/assets.js"></script>
+		<script src="engine/state.machine.js"></script>
+		<script src="engine/state.js"></script>
+		<script src="app/main.js"></script>
+		<script src="app/states/boot.js"></script>
+		<script src="app/state_machines/main.js"></script>
+	</head>
+	<body>
+		<div id="stage"></div>
+		<script>
+			$(function(){
+				window.app = new App();
+			});
+		</script>
+	</body>
+</html>
