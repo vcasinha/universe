@@ -1,8 +1,16 @@
 (function(Engine){
-	Engine.Entity = function(ctx){
-		OO.call(this);
-	};
-	
-	Engine.Entity.prototype = Object.create(OO.prototype);
-	Engine.Entity.prototype.constructor = Engine.Entity;
+	Engine.Entity = Oo.createClass(function(){
+        this.value = 0;
+    }, 
+    {
+        update: function(){
+            this.value += 1;
+            if(this.value > 20){
+                this.value = 0;
+                console.log("Working hard");
+            }
+        }
+    },
+    Engine.Object);
+
 })(Engine);

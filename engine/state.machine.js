@@ -25,28 +25,28 @@
 	};
 	
 	Engine.StateMachine.prototype.trigger = function(event_name){
-		console.log('em.trigger', event_name);
+		//console.log('em.trigger', event_name);
 		this.statesLogic.forEach(function(state_logic){
-			console.log('em.trigger', event_name, state_logic.name);
+			//console.log('em.trigger', event_name, state_logic.name);
 			var new_state = state_logic.callback(this.currentStateName);
 			this.start(new_state);
 		}.bind(this));
 	}
 	
-	Engine.StateMachine.prototype.addState = function(state_name, State){
-		if(State === undefined){
+	Engine.StateMachine.prototype.addState = function(state_name, state_prototype){
+		if(state_prototype === undefined){
 			throw("sm.addState.undefined");
 		}
-		
-		console.log('sm.addState', state_name, State);
-		this.states[state_name] = State;	
+
+		//console.log('sm.addState', state_name, state_prototype);
+		this.states[state_name] = Oo.createClass(null, state_prototype, Engine.State);
 	};
 	
 	Engine.StateMachine.prototype.stop = function(){
 		var that = this;
 		this.requestToStop = true;
 		if(this.currentState){
-			console.log('sm.stop', this.currentState);
+			//console.log('sm.stop', this.currentState);
 			this.ctx.onOnce('sm.state.stop', function(){
 				this.currentState = undefined;
 				this.ctx.trigger('sm.ready');
@@ -55,14 +55,14 @@
 			this.currentState.stop();
 		}
 		else{
-			console.log('sm.ready');
+			//console.log('sm.ready');
 			this.ctx.trigger('sm.ready');
 		}
 	};
 	
 	Engine.StateMachine.prototype.start = function(state_name){
 		var that = this;
-		console.log('sm.start', state_name);
+		//console.log('sm.start', state_name);
 		this.ctx.onOnce('sm.ready', function(){
 			this.startState(state_name);
 		}.bind(that));
@@ -70,7 +70,7 @@
 	};
 	
 	Engine.StateMachine.prototype.startState = function(state_name){
-		console.log('sm.startState', state_name, this.states);
+		//console.log('sm.startState', state_name, this.states);
 		var Constructor = this.states[state_name]
 		if(Constructor === undefined){
 			throw("sm.startState unknown state " + state_name);

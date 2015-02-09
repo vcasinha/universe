@@ -7,7 +7,9 @@
 	
 	Context.prototype.clone = function(){
 		var ctx = new Context(this.items);
-		
+		ctx.display = this.display;
+		ctx.loader = this.loader;
+		ctx.audio = this.audio;
 		return ctx;
 	};
 	
@@ -18,14 +20,21 @@
 		this.ctx = new Context();
 		this.stateMachines = new OO();
 		
-		console.log("engine boot");
+		//console.log("engine boot");
 		this.ctx.display = new Engine.DisplayManager(this.ctx);
-		this.ctx.assets = new Engine.AssetsController(this.ctx);
+		this.ctx.loader = new Engine.Loader(this.ctx);
+		this.ctx.audio = new Engine.AudioManager(this.ctx);
 	}
-	
+
+	//Singleton methods
 	Engine.states = new OO();
 	Engine.stateMachines = new OO();
-	
+	Engine.extend = function(){
+		$.extend.apply($, arguments);		
+		return this;
+	};
+
+	//Object methods
 	Engine.prototype = Object.create(OO.prototype);
 	Engine.prototype.constructor = Engine;
 	
@@ -34,7 +43,7 @@
 	};
 	
 	Engine.prototype.addStateMachine = function(name, StateMachine){
-		console.log("engine.addStateMachine", name, StateMachine);
+		//console.log("engine.addStateMachine", name, StateMachine);
 		this.stateMachines.set(name, StateMachine);
 	};
 	
@@ -44,13 +53,13 @@
 		}
 	
 		var StateMachine = this.stateMachines.get(name);
-		console.log("engine.setStateMachine", name, StateMachine);
+		//console.log("engine.setStateMachine", name, StateMachine);
 		
 		this.ctx.sm = new StateMachine(this.ctx);
 		this.updateCallback = this.ctx.sm.update.bind(this.ctx.sm);
 		this.ctx.on('display.update', this.updateCallback);
 	}
-	
+
 	Engine.prototype.updateCallback = null;
 	Engine.prototype.stateMachines = {};
 	

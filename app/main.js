@@ -9,9 +9,7 @@
 			height: 600
 		};
 		
-		this.stateMachines = new OO();
-		
-		console.log("World", world);
+		///console.log("World", world);
 		world.init(settings);
 		
 		stage_element.dblclick(world.ctx.display.requestFullScreen.bind(world.ctx.display));
@@ -24,6 +22,7 @@
 		world.setStateMachine('main');
 
 		world.ctx.sm.start('boot');
+		this.ctx = world.ctx;
 	};
 	
 	window.App = App;

@@ -41,8 +41,8 @@
 	    
 	    console.log("display.resize", this.width, this.height);
 	    
-	    if(renderer){
-		    renderer.resize(this.width, this.height, null, true, true);
+	    if(this.renderer){
+		    this.renderer.resize(this.width, this.height, null, true, true);
 		}
 	};
 	
