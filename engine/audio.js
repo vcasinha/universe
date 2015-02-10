@@ -1,4 +1,4 @@
-(function(Engine){
+(function(){
     var AudioManager = function(ctx){
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         this.audioContext = new AudioContext();
@@ -9,7 +9,7 @@
 	        var settings = {
 		        onload: function(){
 			        this.set(asset.name, sound);
-	                console.log("audio.load.decode", asset.name, asset);
+	                //console.log("audio.load.decode", asset.name, asset);
 	                this.ctx.trigger('audio.loaded.' + asset.name, [asset]);
 	
 				}.bind(this)
@@ -21,10 +21,5 @@
         },
     };
 
-    AudioManager = Oo.createClass(AudioManager, prototype, [OO, Engine.Object]);
-    
-    //console.log("AudioManager", AudioManager, prototype);
-
-    Engine.AudioManager = AudioManager;
-
-})(Engine);
+    O.register('engine.audio.manager', AudioManager, prototype, ['o', 'engine.object']);
+})();

@@ -1,49 +1,34 @@
-(function(Oo){
-	var Context = function(items){
-		OO.call(this);
-		Oo.EventManager.call(this);
-		Oo.extend(this.items, items);
-	};
-	
-	Context.prototype.clone = function(){
-		var ctx = new Context(this.items);
-		ctx.display = this.display;
-		ctx.loader = this.loader;
-		ctx.audio = this.audio;
-		return ctx;
-	};
-	
-	Context.prototype.constructor = Context;
-	
+(function(){
 	var Engine = function(){
-		OO.call(this);
-		this.ctx = new Context();
-		this.stateMachines = new OO();
+		console.log("engine.init", O);
+		this.ctx = O.instance('engine.context');
 		
 		//console.log("engine boot");
-		this.ctx.display = new Engine.DisplayManager(this.ctx);
-		this.ctx.loader = new Engine.Loader(this.ctx);
-		this.ctx.audio = new Engine.AudioManager(this.ctx);
+		this.ctx.display = O.instance('engine.display.manager', this.ctx);
+		this.ctx.loader = O.instance('engine.loader', this.ctx);
+		this.ctx.audio = O.instance('engine.audio.manager', this.ctx);
+		this.stateMachines = new O();
 	}
 
-	//Singleton methods
-	Engine.states = new OO();
-	Engine.stateMachines = new OO();
 	Engine.extend = function(){
-		$.extend.apply($, arguments);		
+		$.extend.apply($, arguments);
 		return this;
 	};
-
-	//Object methods
-	Engine.prototype = Object.create(OO.prototype);
-	Engine.prototype.constructor = Engine;
 	
 	Engine.prototype.init = function(settings){
 		this.ctx.trigger('init', [settings]);
 	};
 	
-	Engine.prototype.addStateMachine = function(name, StateMachine){
+	Engine.prototype.addStateMachine = function(name){
+		var StateMachine = O.get('app.sm.' + name);
+		
+		//console.log("engine.addStateMachine", name, typeof StateMachine, O.dump());
+		if(typeof StateMachine !== 'function'){
+			throw "Invalid state machine for '" + name + "'";
+		}
+		
 		//console.log("engine.addStateMachine", name, StateMachine);
+		
 		this.stateMachines.set(name, StateMachine);
 	};
 	
@@ -52,16 +37,19 @@
 			this.ctx.off('display.update', this.updateCallback);
 		}
 	
-		var StateMachine = this.stateMachines.get(name);
-		//console.log("engine.setStateMachine", name, StateMachine);
+		var Constructor = this.stateMachines.get(name);
 		
-		this.ctx.sm = new StateMachine(this.ctx);
-		this.updateCallback = this.ctx.sm.update.bind(this.ctx.sm);
+		this.ctx.sm = new Constructor(this.ctx);
+		this.updateCallback =  function(){
+			this.ctx.sm.update();
+		}.bind(this);
+
 		this.ctx.on('display.update', this.updateCallback);
+
+		console.log("engine.setStateMachine.end", name, this.ctx.sm);
 	}
 
-	Engine.prototype.updateCallback = null;
-	Engine.prototype.stateMachines = {};
+	O.register('engine', Engine);
 	
 	window.Engine = Engine;
-})(Oo);
+})();

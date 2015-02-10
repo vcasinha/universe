@@ -1,7 +1,7 @@
 (function(Engine){
-	Engine.State = function(ctx){
+	var State = function(ctx){
 		this.ctx = ctx;
 	};
 	
-	Engine.State.prototype.constructor = Engine.State;
+	O.set('engine.statemachine.state', O.createClass(State));
 })(Engine);

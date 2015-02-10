@@ -1,18 +1,23 @@
-(function(Engine){
-	Engine.Actor = Oo.createClass(function(ctx){
-		console.log("actor.construct");
-		
-		var sprite = ctx.display.sprite('texture');
-		sprite.anchor.set(0.5, 0.5);
-		sprite.position.set(100, 100);
-		
-		this.ctx.display.add(sprite);
-		console.log("actor.construct.end");
-    }, 
-    {
-        update: function(){
-	        console.log("Actor update");
+(function(){
+    var Actor = function(ctx){
+        console.log("actor.construct");
+        
+        this.sprite = ctx.display.sprite('texture');
+        this.sprite.anchor.set(0.5, 0.5);
+        this.sprite.position.set(100, 100);
+        this.sprite.click = function(data){
+            console.log("Click", data);
+        };
+        
+        ctx.display.add(this.sprite);
+        console.log("actor.construct.end");
+
+        this.update = function(){
+            this.sprite.position.x += 1;
         }
-    },
-    Engine.Entity);
-})(Engine);
+    };
+
+    Actor.prototype.classes = ['engine.entity'];
+
+	O.register('app.actor', Actor);
+})();

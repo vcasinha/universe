@@ -1,10 +1,10 @@
-(function(Oo, PIXI){
+(function(PIXI){
 	var DisplayManager = function(ctx){
 		console.log('engine.display boot', arguments);
 		var that = this;
 		var renderer = null;
 		var stage = null;
-		this.assets = new OO();
+		this.assets = new O();
 		
 		//init the world
 		function init(settings){
@@ -13,7 +13,7 @@
 			this.settings = settings;
 			
 		    // create an new instance of a pixi stage
-		    this.stage = new PIXI.Stage(settings.background || 0x000000, true);
+		    this.stage = new PIXI.Stage(settings.background || 0x000000, settings.interactive);
 		 
 		    // create a renderer instance.
 		    this.renderer = PIXI.autoDetectRenderer(settings.width, settings.height);
@@ -26,7 +26,6 @@
 			requestAnimFrame(update.bind(this));
 
 			ctx.trigger('display.update', [time]);
-			
 			this.renderer.render(this.stage);
 		}
 		
@@ -70,6 +69,5 @@
 		return this.stage.addChild(child);
 	};
 	
-	window.Engine.DisplayManager = Oo.createClass(DisplayManager, prototype, [OO]);
-	
-})(Oo, PIXI);
+	O.register('engine.display.manager', DisplayManager, prototype, ['o', 'engine.object'])
+})(PIXI);

@@ -1,21 +1,22 @@
-(function(Engine, App){
-	var StateMachine = function(ctx){
+(function(){
+	var StateMachine = function(){
 		var boot_state = {
 			start: function(ctx){
 				console.log("boot.start");
 				
 				var assets = [
-					{name: 'music', location: 'audio/bach.ogg', type: 'audio'},
+					//{name: 'music', location: 'audio/bach.ogg', type: 'audio'},
 					{name: 'texture', location: 'images/diamond.png', type: 'image'},
 				];
 
 				ctx.loader.queueList(assets);
-				ctx.loader.load();
-				ctx.trigger('sm.state.start');
+				ctx.loader.load(assets, function(){
+					ctx.sm.start('splash');
+				}.bind(this));
 				
-				ctx.onOnce('assets.loaded', function(){
-					this.ctx.sm.start('splash');
-				}.bind(this))
+				ctx.once('assets.loaded', function(){
+					
+				}.bind(this));
 			},
 			stop: function(ctx){
 				console.log("boot.stop");
@@ -29,10 +30,9 @@
 
 		var splash_state = {
 			start: function(ctx){
-				console.log("splash.start");
-				ctx.audio.get('music').play();
-				ctx.actor = new Engine.Actor(ctx);
-				
+				console.log("scene.splash.start");
+				//ctx.audio.get('music').play();
+				this.actor = O.instance('app.actor', ctx);
 			},
 			stop: function(ctx){
 				console.log("boot.stop");
@@ -57,9 +57,6 @@
 		}});
 	};
 	
-	StateMachine = Oo.createClass(StateMachine, {}, [Engine.StateMachine]);
-
-	//console.log("statemachine.main", StateMachine);
-	Engine.stateMachines.set('main', StateMachine);
+	O.register('app.sm.main', StateMachine, {}, ['engine.statemachine']);
 	
-})(Engine, App);
+})();

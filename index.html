@@ -22,10 +22,12 @@
 		<script src="lib/jquery.min.js"></script>
 		<script src="lib/howler.min.js"></script>
 		<script src="lib/jquery.binarytransport.js"></script>
-		<script src="lib/oo.js"></script>
-		<script src="lib/oo.events.js"></script>
+		<script src="../O/O.js"></script>
+		<script src="../O.events/O.events.js"></script>
 		
 		<script src="engine/engine.js"></script>
+		<script src="engine/context.js"></script>
+		<script src="engine/application.js"></script>
 		<script src="engine/object.js"></script>
 		<script src="engine/entity.js"></script>
 		<script src="engine/display.js"></script>
@@ -33,17 +35,26 @@
 		<script src="engine/audio.js"></script>
 		<script src="engine/state.machine.js"></script>
 		<script src="engine/state.js"></script>
+		
 		<script src="app/main.js"></script>
 		<script src="app/actor.js"></script>
-		<script src="app/states/boot.js"></script>
 		<script src="app/state_machines/main.js"></script>
 	</head>
 	<body>
 		<div id="stage"></div>
 		<script>
-			$(function(){
-				window.app = new App();
-			});
+			window.onload = function(){
+				var settings = {
+					background: 0xffffff,
+					width: 800,
+					height: 600,
+					interactive: true,
+				};
+				
+				var app = O.instance('app');
+				app.init(settings);
+				console.log("O", app);
+			}
 		</script>
 	</body>
 </html>
