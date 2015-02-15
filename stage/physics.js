@@ -1,14 +1,14 @@
 (function(){
-	var Physics = function(stage, settings){
+	var StagePhysics = function(stage, settings){
 
     };
     
-    Physics.prototype.classes = [];
-	Physics.prototype.attachBody = function(settings){
+    StagePhysics.prototype.classes = [];
+	StagePhysics.prototype.attachBody = function(settings){
 		settings.x = entity.position.x;
 		settings.y = entity.position.y;
 		this.ctx.physics.attachBody(entity, settings);
 	};
     
-	O.register('engine.entity', Entity);
+	O.register('stage.physics', StagePhysics);
 })();

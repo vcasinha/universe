@@ -1,7 +1,6 @@
 (function(Engine){
-	var StateMachine = function(ctx){
-		this.ctx = ctx;
-		//console.log("sm.construct", this.stateContext.extension);
+	var StateMachine = function(){
+		console.log("component.state.construct");
 
 		this.statesLogic = [];
 		this.bootState = null;
@@ -9,19 +8,44 @@
 		this.states = {};
 		this.paused = false;
 		
+		var step = this.settings.step || 1/30;
+		var current_step = 0;
+		
 		var update = function(dt){
+			if(dt < current_step){
+				current_step -= dt;
+				return false;
+			}
+
+// 			console.log("state update");
 			this.update(dt);
+			current_step = step;
+			
+		}.bind(this);
+		
+		var init = function(){
+			console.log("component.state.init", this.settings);
+			for(var i in this.settings.states){
+				var state = this.settings.states[i];
+				this.addState(state, 'sm.' + state);
+			}
 		}.bind(this);
 		
 		var stop = function(){
-			ctx.off('update', update);
+			this.ctx.off('update', update);
 		}.bind(this);
 		
-		ctx.on('update', update);
-		ctx.once('stop', stop);
+		var start = function(){
+			this.start(this.settings.boot || 'boot');
+		}.bind(this);
+		
+		this.ctx.once('init', init);
+		this.ctx.once('start', start);
+		this.ctx.on('update', update);
+		this.ctx.once('stop', stop);
 	};
 
-	StateMachine.prototype.classes = ['engine.object'];
+	StateMachine.prototype.classes = ['engine.component'];
 
 	StateMachine.prototype.changeTo = function(state_name){
 		this.stop();
@@ -68,6 +92,6 @@
 		}
 	};
 	
-	O.register('engine.state.machine', StateMachine, StateMachine.prototype);
+	O.register('component.state', StateMachine);
 
 })();

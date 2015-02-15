@@ -1,17 +1,17 @@
 (function(Engine){
-	var Loader = function(ctx){
+	var Loader = function(){
 		this.queue = [];
 	};
 	
-	var prototype = {};
+	Loader.prototype.classes = ['engine.component'];
 	
-	prototype.queueList = function(list){
+	Loader.prototype.queueList = function(list){
 		list.forEach(function(asset){
 			this.queueAsset(asset);
 		}.bind(this));
 	};
 
-	prototype.queueAsset = function(asset){		
+	Loader.prototype.queueAsset = function(asset){		
 		for(var i in this.queue){
 			if(this.queue[i].name == asset.name){
 				//console.warn("assets.queueAsset.replace", asset.name, asset);
@@ -29,7 +29,7 @@
 		return this;
 	};
 	
-	prototype.load = function(list, callback){
+	Loader.prototype.load = function(list, callback){
 		this.queueList(list);
 		this.processQueue();
 		if(typeof callback == 'function'){
@@ -38,7 +38,7 @@
 		return this;
 	};
 	
-	prototype.processQueue = function(){
+	Loader.prototype.processQueue = function(){
 		this.queue.forEach(function(asset){
 			//console.log("loader.load", asset.name, asset.location);
 			
@@ -68,7 +68,7 @@
 		return this;
 	};
 	
-	prototype.handlePIXI = function(asset){
+	Loader.prototype.handlePIXI = function(asset){
 		var loaderByType = {
 			'image': PIXI.ImageLoader,
 			'json': PIXI.JsonLoader,
@@ -83,7 +83,7 @@
 
 		var loader = new Constructor(asset.location, false);
 		loader.on('loaded', function(){
-			this.ctx.renderer.set(asset.name, asset);
+			this.ctx.renderer.assets.set(asset.name, asset);
 			//console.log("loader.handlePIXI.loaded", asset.name, asset);
 			this.ctx.trigger(asset.type + '.loaded.' + asset.name, asset);
 		}.bind(this));
@@ -91,16 +91,16 @@
 		loader.load();
 	};
 
-	prototype.handleAudio = function(asset){
+	Loader.prototype.handleAudio = function(asset){
 		//console.log("loader.handleAudio", asset.name);
 		this.ctx.audio.load(asset);
 	};
 
-	prototype.removeFromQueue = function(asset){
+	Loader.prototype.removeFromQueue = function(asset){
 		this.queue.splice(this.queue.indexOf(asset), 1);
 		return this;
 	};
 	
-	O.register('engine.loader', Loader, prototype, ['engine.object']);
+	O.register('component.loader', Loader);
 	
 })();

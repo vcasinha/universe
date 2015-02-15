@@ -1,41 +1,83 @@
 (function(){
 	var Engine = function(settings){
-		this.paused = false;
+        this.isRunning = false,
+		this.isPaused = false;
+		this.components = [];
+
+        this.settings = settings = O.extend(true, {}, this.settings_default, settings);
+
+        console.log("engine.construct", settings);
 		
-		this.ctx = O.instance('engine.context');
-		this.settings = settings;
-		
-		console.log("engine.construct", settings);
-		this.timePrevious = new Date().getTime();
-		
-		this.updateCallback = this.update.bind(this);
+		this.ctx = O.instance('engine.context', settings);
+		console.log("engine.construct Initialize context");
+
+
+        var time_previous = time_current = new Date().getTime();
+        var time_delta = 0;
+        var update = function(){
+	        
+            requestAnimationFrame(update);
+            if(this.isRunning){
+                time_current = new Date().getTime();
+                time_delta = (time_current - time_previous) / 1000;
+                
+				this.ctx.trigger('update', time_delta, time_current);
+                
+                time_previous = time_current;
+            }
+
+        }.bind(this);
+        
+        var stop = function(){
+	        this.ctx.off('start', start);
+	        this.ctx.off('pause', pause);
+	        this.ctx.off('stop', stop);
+	        
+        }.bind(this);
+        
+        var start = function(){
+	        this.isRunning = true;
+        }.bind(this);
+        
+        var pause = function(){
+	        this.isRunning = false;
+        }.bind(this);
+        
+        this.ctx.on('start', start);
+        this.ctx.on('pause', pause);
+        
+        //Setup animation frame
+        console.log("engine.construct Setup animation frame");
+        requestAnimationFrame(update);
 	};
+	
+	Engine.prototype.classes = ['o.events'];
+
+    Engine.prototype.settings_default = {
+	    components: {
+		    renderer: 	'component.renderer.pixi',
+		    audio: 		'component.audio.howl',
+		    physics: 	'component.physics.box2dweb',
+		    stage: 		'component.stage',
+		    loader: 	'component.loader',
+		    state: 		'component.state',
+		    data: 		'component.data'
+	    },
+	    renderer: {
+		    
+	    }
+    };
+
+    Engine.prototype.loadComponent = function(name, object_name){
+		this.ctx.loadComponent(name, object_name);
+		
+		return this;
+    };
 
 	Engine.prototype.init = function(){
-		console.log("engine.init", this.settings);
-		var default_components = {
-			loader: 'engine.loader',
-			renderer: 'engine.renderer.pixi',
-			audio: 'engine.audio.manager',
-			stage: 'engine.stage',
-			state: 'engine.state.machine'
-		};
-		
-		var components = O.extend({}, default_components, this.settings.components);
-		
-		for(var i in components){
-			this.addComponent(i, components[i]);
-		}
-		
-		console.log("engine.init.start");
-		this.ctx.trigger('start', this.settings);
+		console.log("engine.init");
+		this.ctx.trigger('init');
 	};
-
-	Engine.prototype.addComponent = function(name, object_name){
-		console.log("engine.init.addComponent", name);
-		var component = O.instance(object_name, this.ctx);
-		this.ctx.set(name, component)
-	}
 
 	Engine.prototype.handleFullScreen = function(){
 		return this.ctx.renderer.requestFullScreen.bind(this.ctx.renderer)
@@ -59,9 +101,7 @@
 
 	Engine.prototype.start = function(){
 		console.log("engine.start");
-		requestAnimationFrame(this.updateCallback);
-		this.ctx.state.start('boot');
-		return this;
+		this.ctx.trigger('start');
 	};
 	
 	Engine.prototype.stop = function(){
@@ -87,27 +127,3 @@
 	window.Engine = Engine;
 })();
 
-(function() {
-    var lastTime = 0;
-    var vendors = ['webkit', 'moz'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame =
-          window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
-    }
-
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
-              timeToCall);
-            lastTime = currTime + timeToCall;
-            return id;
-        };
-
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
-            clearTimeout(id);
-        };
-}());

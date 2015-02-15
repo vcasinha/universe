@@ -7,25 +7,24 @@
 		this.engine = new Engine(settings);
 		this.engine.init();
 		
-		if(typeof settings.states !== 'object'){
-			throw("States are undefined");
-		}
-		
-		settings.states.forEach(function(state){
-			this.engine.addState(state, 'sm.' + state);
-		}.bind(this));
-		
 		this.ctx = this.engine.ctx;
 		
 		var stage_element = $('#stage');
 		stage_element.append(this.engine.getElement());
-		stage_element.dblclick(this.engine.handleFullScreen());
+		
+		var fs = function(){
+			this.engine.handleFullScreen();
+			stage_element.off('click', fs);
+		}.bind(this);
+		
+		stage_element.click(fs);
 		
 		this.engine.handleResize(stage_element.width(),stage_element.height());
 		
 		$(window).on('resize', function(){
 			this.engine.handleResize(stage_element.width(),stage_element.height());
 		}.bind(this));
+		
 	};
 	
 	Application.prototype.start = function(){

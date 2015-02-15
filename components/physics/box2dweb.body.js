@@ -1,7 +1,7 @@
 (function(){
 	var Body = function (world, details) {
 		this.details = details = details || {};
-		 
+		//console.log("physics.body.construct", details);
 		// Create the definition
 		this.definition = new b2BodyDef();
 		 
@@ -21,7 +21,7 @@
 		this.fixtureDef = new b2FixtureDef();
 			for (var l in this.fixtureDefaults) {
 			this.fixtureDef[l] = details[l] || this.fixtureDefaults[l];
-		}
+		};
 		 
 		 
 		details.shape = details.shape || this.defaults.shape;
@@ -35,8 +35,9 @@
 				this.fixtureDef.shape = new b2PolygonShape();
 				this.fixtureDef.shape.SetAsArray(details.points, details.points.length);
 			break;
-			case "block":
+			case "box":
 			default:
+				console.log("box", details);
 				details.width = details.width || this.defaults.width;
 				details.height = details.height || this.defaults.height;
 				 
@@ -50,7 +51,7 @@
  
  
 	Body.prototype.defaults = {
-		shape: "block",
+		shape: "box",
 		width: 5,
 		height: 5,
 		radius: 2.5
@@ -72,5 +73,5 @@
 		fixedRotation: false
 	};
 	
-	O.register('physics.body', Body);
+	O.register('physics.body.box2d', Body);
 })();

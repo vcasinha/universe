@@ -4,7 +4,7 @@
 		this.stage.reset();		
 	};
 	
-	State.prototype.classes = ['engine.object']
+	State.prototype.classes = ['engine.component']
 	
 	State.prototype.update = function(){
 	};

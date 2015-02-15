@@ -1,37 +1,30 @@
 (function(){
-	var Physics = function(ctx){
-		var start = function(settings){
-			var settings = settings.physics || {
-				gravity: {
-					x: 0.0,
-					y: 100.0
-				}
-			};
-			
+	var Physics = function(){
+		var init = function(settings){
 			this.dtRemaining = 0;
-			this.stepAmount = settings.stepAmount || 1/60;
-			this.scale = settings.scale || 10;
+			this.stepAmount = this.settings.stepAmount || 1 / 60;
+			this.scale = this.settings.scale || 10;
 			
-			var gravity = new b2Vec2(settings.gravity.x || 0.0, settings.gravity.y || 10.0);
+			var gravity = new b2Vec2(this.settings.gravity.x || 0.0, this.settings.gravity.y || 10.0);
 			this.world = new b2World(gravity, true);
 			//this.debug();
 			
 		}.bind(this);
 		
 		var stop = function(){
-			
+			this.ctx.off('update', update);
 		}.bind(this);
 		
 		var update = function(dt){
 			this.update(dt);
 		}.bind(this);
 		
-		ctx.once('start', start);
-		ctx.on('update', update);
-		ctx.once('stop', stop);
+		this.ctx.once('init', init);
+		this.ctx.on('update', update);
+		this.ctx.once('stop', stop);
 	};
 	
-	Physics.prototype.classes = ['o.events', 'engine.object'];
+	Physics.prototype.classes = ['engine.component', 'o.events'];
 	
 	Physics.prototype.update = function(dt){
 		this.dtRemaining += dt;
@@ -77,7 +70,7 @@
 		if(settings.height)settings.height /= this.scale;
 		if(settings.radius)settings.radius /= this.scale;
 		
-		return O.instance('physics.body', this.world, settings);
+		return O.instance('physics.body.box2d', this.world, settings);
 	}
 	
 	Physics.prototype.attachBody = function(entity, settings){
@@ -94,5 +87,5 @@
 		}.bind(this));
 	};
 	
-	O.register('engine.physics.box2d', Physics);
+	O.register('component.physics.box2d', Physics);
 })();
