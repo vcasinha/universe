@@ -1,1 +1,0 @@
-O.register('stage.component', function(){});

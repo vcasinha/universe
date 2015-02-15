@@ -1,6 +1,6 @@
 (function(){
-	var Animation = function(parent, sprite){		
-		this.sprite = sprite;
+	var Animation = function(parent, sprite){
+		this.sprite = this.settings.sprite;
 		this.animations = {};
 		this.currentAnimation = null;
 		
@@ -29,12 +29,12 @@
 			this.off(update);
 		}.bind(this);
 		
-		parent.on('update', update);
+		parent.on('addon.update', update);
 		parent.once('stop', stop);
 		this.sprite.setFrame(0);
 	};
 	
-	Animation.prototype.classes = ['stage.component'];
+	Animation.prototype.classes = ['stage.object'];
 	
 	Animation.prototype.add = function(animation){
 		if(typeof animation !== 'object'){

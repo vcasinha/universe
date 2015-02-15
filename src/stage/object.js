@@ -20,15 +20,28 @@
 		
 		this.settings = O.extend({}, default_settings, settings);
 		
+		var update = function(){
+			this.update();
+		}.bind(this);
+		
+		var stop = function(){
+			this.ctx.off('update', update);
+		}.bind(this);
+		
+		this.ctx.on('update', update);
+		this.ctx.once('stop', stop);
 		//console.log('stage.object.construct', this.id, this.settings, this.ctx);
     };
     
     StageObject.prototype.classes = ['o.events'];
     
     StageObject.prototype.update = function(dt){
-	    this.trigger('update', dt);
-	    
+	    //this.trigger('update', dt);
     };
+    
+    StageObject.prototype.getID = function(){
+	    return this.settings.id;
+    }
     
     O.register('stage.object', StageObject);
 })();

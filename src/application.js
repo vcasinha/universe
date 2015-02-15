@@ -4,7 +4,7 @@
 	};
 	
 	Application.prototype.init = function(settings){
-		this.engine = new Engine(settings);
+		this.engine = O.instance('engine', settings);
 		this.engine.init();
 		
 		this.ctx = this.engine.ctx;

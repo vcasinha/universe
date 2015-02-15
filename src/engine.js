@@ -6,7 +6,7 @@
 
         this.settings = settings = O.extend(true, {}, this.settings_default, settings);
 
-        console.log("engine.construct", settings);
+        //console.log("engine.construct", settings);
 		
 		this.ctx = O.instance('engine.context', settings);
 		console.log("engine.construct Initialize context");
@@ -123,7 +123,9 @@
 	}
 
 	O.register('engine', Engine);
-	
+
+    O.instance('asdas');
+
 	window.Engine = Engine;
 })();
 

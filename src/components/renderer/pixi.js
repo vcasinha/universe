@@ -17,7 +17,7 @@
 	};
 	
 	var RendererPixi = function(ctx, settings){
-		console.log('renderer.pixi.start', this.settings);
+		console.log('renderer.pixi.start', this.settings, arguments);
 
 		var update = function(){
 			this.renderer.render(this.stage);

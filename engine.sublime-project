@@ -1,0 +1,17 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		},
+		{
+			"follow_symlinks": true,
+			"path": "/Volumes/miro.oorganica.com/oorganica.com/pages/physics"
+		},
+		{
+			"follow_symlinks": true,
+			"path": "/Volumes/miro.oorganica.com/oorganica.com/pages/O"
+		}
+	]
+}
