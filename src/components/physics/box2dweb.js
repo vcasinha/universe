@@ -3,14 +3,14 @@
 		var init = function(settings){
 			this.dtRemaining = 0;
 			this.stepAmount = this.settings.stepAmount || 1 / 60;
-			this.scale = this.settings.scale || 10;
+			this.scale = this.settings.scale || 100;
 			
 			var gravity = new b2Vec2(this.settings.gravity.x || 0.0, this.settings.gravity.y || 10.0);
 			this.world = new b2World(gravity, true);
 			//this.debug();
 			
 		}.bind(this);
-		
+
 		var stop = function(){
 			this.ctx.off('update', update);
 		}.bind(this);
@@ -34,6 +34,7 @@
 			8, // velocity iterations
 			3); // position iterations
 		} 
+
 		this.trigger('physics.update');
 	};
 	
@@ -64,28 +65,8 @@
 	}
 	
 	Physics.prototype.createBody = function(settings){
-		if(settings.x)settings.x /= this.scale;
-		if(settings.y)settings.y /= this.scale;
-		if(settings.width)settings.width /= this.scale;
-		if(settings.height)settings.height /= this.scale;
-		if(settings.radius)settings.radius /= this.scale;
-		
 		return O.instance('physics.body.box2d', this.world, settings);
 	}
-	
-	Physics.prototype.attachBody = function(entity, settings){
-		entity.body = this.createBody(settings).body;
-		entity.body.SetUserData(entity);
-		
-		this.on('physics.update', function(){
-			var position = entity.body.GetPosition();
-			var angle = entity.body.GetAngle();
-			
-			entity.position.x = position.x * this.scale;// * this.scale;
-			entity.position.y = position.y * this.scale;// * this.scale;
-			entity.rotation = angle;
-		}.bind(this));
-	};
 	
 	O.register('component.physics.box2d', Physics);
 })();

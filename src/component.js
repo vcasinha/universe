@@ -7,12 +7,7 @@
             this.update(dt);
         }.bind(this);
         
-        var stop = function(){
-            ctx.off('component.update', update);
-        }.bind(this);
-        
         ctx.on('component.update', update);
-        ctx.once('stop', stop);
     };
 
     Component.prototype.classes = [];

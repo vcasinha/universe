@@ -57,15 +57,14 @@
 	};
 	
 	Stage.prototype.stop = function(){
-		for(var id in this.objects){
-			this.objects[id].stop();
-			delete this.objects[i];
-		}
+
 	};
 	
 	Stage.prototype.reset = function(){
-		this.stop();
-		this.entities = {};
+        for(var id in this.objects){
+            this.objects[id].stop();
+            delete this.objects[i];
+        }
 	};
 	
 	Stage.prototype.get = function(object_name){
@@ -81,6 +80,7 @@
 		
 		console.log('stage.createAdd', settings);
 		var object = O.instance(settings.instance, this, settings);
+
 		this.add(object);
 
 		return object;

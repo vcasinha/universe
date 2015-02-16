@@ -1,6 +1,7 @@
 (function(){
 	var Engine = function(settings){
-        this.isRunning = false,
+        this.isRunning = false;
+        this.stepping = false;
 		this.isPaused = false;
 		this.components = [];
 
@@ -14,10 +15,10 @@
 
         var time_previous = time_current = new Date().getTime();
         var time_delta = 0;
-        var update = function(){
-	        
+        var update = function(dt, step){
             requestAnimationFrame(update);
-            if(this.isRunning){
+            if(this.isRunning || step){
+                console.log("Running");
                 time_current = new Date().getTime();
                 time_delta = (time_current - time_previous) / 1000;
                 
@@ -26,13 +27,6 @@
                 time_previous = time_current;
             }
 
-        }.bind(this);
-        
-        var stop = function(){
-	        this.ctx.off('start', start);
-	        this.ctx.off('pause', pause);
-	        this.ctx.off('stop', stop);
-	        
         }.bind(this);
         
         var start = function(){
@@ -120,11 +114,9 @@
 		}
 		
 		this.timePrevious = this.timeCurrent;
-	}
+	};
 
 	O.register('engine', Engine);
-
-    O.instance('asdas');
 
 	window.Engine = Engine;
 })();

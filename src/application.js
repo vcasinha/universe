@@ -27,6 +27,10 @@
 		
 	};
 	
+    Application.prototype.step = function(){
+        this.ctx.trigger('update', 1/60, true);
+    };
+
 	Application.prototype.start = function(){
 		this.engine.start();
 	};

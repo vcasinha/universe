@@ -19,17 +19,26 @@
 		};
 		
 		this.settings = O.extend({}, default_settings, settings);
-		
+        
+		this.position = O.instance('vec2');
+
+        var position_update = function(position){
+            //console.log('stage.object position.update', position);
+            this.position.x = position.x;
+            this.position.y = position.y;
+        }.bind(this);
+
+        var rotation_update = function(angle){
+            this.rotation = angle;
+        }.bind(this);
+
 		var update = function(){
-			this.update();
+            this.trigger('addon.update');
 		}.bind(this);
-		
-		var stop = function(){
-			this.ctx.off('update', update);
-		}.bind(this);
-		
-		this.ctx.on('update', update);
-		this.ctx.once('stop', stop);
+
+        this.on('position.update', position_update);
+        this.on('rotation.update', rotation_update);
+		this.ctx.on('update', update, 'stop');
 		//console.log('stage.object.construct', this.id, this.settings, this.ctx);
     };
     

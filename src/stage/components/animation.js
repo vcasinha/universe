@@ -1,9 +1,14 @@
 (function(){
-	var Animation = function(parent, sprite){
-		this.sprite = this.settings.sprite;
+	var Animation = function(parent, user_settings, sprite){
+		this.sprite = sprite;
 		this.animations = {};
 		this.currentAnimation = null;
 		
+        if(user_settings.load){
+            for(var i in user_settings.load){
+                this.add(user_settings.load[i]);
+            }
+        }
 		//console.log('animation.construct', sprite);
 		//Handle events
 		var step = 1 / 1;
@@ -25,16 +30,12 @@
 			}
 		}.bind(this);
 		
-		var stop = function(){
-			this.off(update);
-		}.bind(this);
 		
 		parent.on('addon.update', update);
-		parent.once('stop', stop);
 		this.sprite.setFrame(0);
 	};
 	
-	Animation.prototype.classes = ['stage.object'];
+	Animation.prototype.classes = ['engine.component'];
 	
 	Animation.prototype.add = function(animation){
 		if(typeof animation !== 'object'){
@@ -58,8 +59,8 @@
 		
 		this.currentAnimation = this.animations[name];
 		this.currentAnimation.currentFrame = this.currentAnimation.startFrame;
-		console.log("animation.play", this.currentAnimation);
-	}
+		//console.log("animation.play", this.currentAnimation);
+	};
 	
 	O.register('addon.animation', Animation);
 })();
