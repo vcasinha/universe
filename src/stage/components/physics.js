@@ -9,32 +9,37 @@
         this.parent = parent;
 
         this.position = parent.position.clone();
+        this.position.divide(this.settings.scale);
         this.angle = parent.rotation;
         
-        //this.position.divide(this.settings.scale);
-        console.log('physics.construct.position', this.position);
+        
+        console.log('physics.construct.position', this.position.x, this.position.y);
+        
+       
         if(this.settings.body){
+            this.settings.body.position = this.position;
             this.attachBody(this.settings.body);
+            this.body.SetPosition(this.position);
         }
 
         var position_update = function(position){
-            if(this.body && this.body.setTransform && position != this.position){
-                console.log('physics.position.update', position);
-                //position.divide(this.settings.scale);
-                //this.position.set(position);
-                //this.body.setTransform(position.x / this.settings.scale, position.y / this.settings.scale, this.angle);
+            if(this.body && position != this.position){
+                position.divide(this.settings.scale);
+                rateLimit.message('physics.position.update', position.x, position.y, this.body.SetPosition);
+                this.position.set(position);
+                this.body.SetPosition(this.position);
             }
         }.bind(this);
         parent.on('position.update', position_update);
 
-        var addon_update = function(){
+        var physics_update = function(){
             if(this.body){
                 var body_position = this.body.GetPosition();
                 var position = O.i('vec2', body_position);
                 position.multiply(this.settings.scale);
-                
+                rateLimit.message('physics.update', position.x, position.y);
                 //console.log('position.update', this.position.x, this.position.y);
-                if(this.position.compare(body_position) === false){
+                if(this.position.compare(position) === false){
                     this.position.set(position);
                     this.parent.trigger('position.update', this.position);
                 }
@@ -47,7 +52,7 @@
             }
 
         }.bind(this);
-        this.physics.on('physics.update', addon_update);
+        this.physics.on('physics.update', physics_update);
     };
     
     StagePhysics.prototype.classes = ['engine.component'];
@@ -55,7 +60,6 @@
 	StagePhysics.prototype.attachBody = function(settings){
 		settings.position = this.position;
 		this.body = this.physics.createBody(settings).body;
-        console.log("physics.attachBody", this.body);
 	};
     
 	O.register('addon.physics', StagePhysics);

@@ -1,6 +1,5 @@
 (function(){
 	var Application = function(settings){
-		
 	};
 	
 	Application.prototype.init = function(settings){
@@ -28,7 +27,8 @@
 	};
 	
     Application.prototype.step = function(){
-        this.ctx.trigger('update', 1/60, true);
+    	console.log('application.step');
+        this.ctx.trigger('engine.update', 1/60, true);
     };
 
 	Application.prototype.start = function(){
@@ -41,7 +41,8 @@
 	
 	Application.prototype.togglePause = function(){
 		//Pause audio too
-		this.engine.paused = !this.engine.paused;
+		this.engine.isRunning = !this.engine.isRunning;
+		console.log('application.togglePause', this.engine.isRunning);
 	};
 	
 	O.register('engine.application', Application);

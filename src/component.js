@@ -1,17 +1,17 @@
 (function(Engine){
     var Component = function(ctx, settings){
 	    this.ctx = ctx;
-        this.settings = O.extend({}, this.default_settings, settings);
+        this.settings = O.extend({}, this.settingsDefault, settings);
         
         var update = function(dt){
+            console.log('component.update', dt);
             this.update(dt);
         }.bind(this);
-        
         ctx.on('component.update', update);
     };
 
     Component.prototype.classes = [];
-    Component.prototype.settings_default = {
+    Component.prototype.settingsDefault = {
         name: 'Unnamed component',
         version: '0.0',
         paused: false

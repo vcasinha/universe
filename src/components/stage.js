@@ -1,32 +1,27 @@
 (function(){
 	var Stage = function(){
-		console.log("component.construct");
+		console.log("stage.construct", this.settings);
 		this.objects = {};
 		
 		var step = this.settings.step || 1/60;
 		var current_step = 0;
 		var time_before = new Date().getTime();
-		var update = function(dt){
-			if(dt < current_step){
-				current_step -= dt;
-				return false;
-			}
-			time_now = new Date().getTime();
-			time_delta = (time_now - time_before) / 1000;
-			time_before = time_now;
-			
+
+		var update = function(dt){			
 			//Update listeners
 			
-			this.trigger('update', time_delta);
-			this.trigger('addon.update', time_delta);
+			//this.trigger('update', dt);
+			this.trigger('addon.update', dt);
 			
 			//Update attached objects
-			this.update(time_delta / 1000);
-			current_step = step;
+			this.update(dt);
 			
 		}.bind(this);
 		
 		var init = function(){
+            console.log('stage.init');
+            this.renderContainer = O.i('engine.layer');
+            this.ctx.renderer.add(this.renderContainer);
 			this.start();
 			this.reset();
 		}.bind(this);
@@ -36,7 +31,7 @@
 			this.ctx.off('update', update);
 		}.bind(this);
 
-		this.ctx.once('init', init);
+		this.ctx.once('start', init);
 		this.ctx.once('stop', stop);
 		this.ctx.on('update', update);
 	};
@@ -52,8 +47,6 @@
 	};
 	
 	Stage.prototype.start = function(){
-		this.container = this.ctx.renderer.layer();
-		this.ctx.renderer.add(this.container);
 	};
 	
 	Stage.prototype.stop = function(){
@@ -71,31 +64,30 @@
 		return this.objects[object_name];
 	};
 	
-	Stage.prototype.createAdd = function(user_settings){		
-		var default_settings = {
-			instance: 'stage.object',
-		};
-		
-		var settings = O.extend({}, default_settings, user_settings);
-		
-		console.log('stage.createAdd', settings);
-		var object = O.instance(settings.instance, this, settings);
+	Stage.prototype.createAdd = function(user_settings){	
+        console.log('stage.createAdd', user_settings);
 
+		user_settings.instance = user_settings.instance || 'stage.object';
+		var object = O.instance(user_settings.instance, user_settings);
 		this.add(object);
 
 		return object;
 	};
 	
 	Stage.prototype.add = function(object){
-		var id = object.getID();
-		if(id === undefined){
-			console.warn("stage.add Object ID is undefined", object);
-			throw("Object ID is undefined");
+		if(typeof object !== 'object' || object.settings.id === undefined){
+			console.warn("stage.add Invalid object", object);
+			throw("Object is undefined invalid");
 		}
 		
-		console.log('stage.add', id, this.objects);
-		this.objects[id] = object;
-		
+		//console.log('stage.add', object.settings.id);
+        object.stage = this;
+        object.ctx = this.ctx;
+		this.objects[object.settings.id] = object;
+		this.renderContainer.addChild(object.renderContainer);
+
+        object.trigger('start');
+
 		return this;
 	};
 	
@@ -113,22 +105,16 @@
 		return this;
 	};
 	
+	Stage.prototype.settingsDefault = {
+		step: 1/60
+	};
+
 	Stage.prototype.update = function(dt){
-/*
-	    if(dt < this.step){
-		    this.step -= dt;
-	    }
-	    else{
-		    var show = true;
-		    this.step = 1;
-	    }
-*/
-	    
-/*
+		//rateLimit.message('stage.update', 1/dt);
 		for(var id in this.objects){
-			this.objects[id].update(dt);
+			this.objects[id].trigger('addon.update', dt);
+			this.objects[id].trigger('update', dt);
 		}
-*/
 	};
 	/*
 	Stage.prototype.createContainer = function(){

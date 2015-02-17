@@ -1,25 +1,9 @@
 (function(PIXI){
-	PIXI.Point.prototype.mulScalar = function(scalar){
-		this.x *= scalar;
-		this.y *= scalar;
-	};
-	
-	PIXI.Point.prototype.from = function(point){
-		this.set(point.x, point.y);
-	};
-	
-	PIXI.Point.prototype.add = function(point){
-		this.set(this.x + point.x, this.y + point.y);
-	};
-	
-	PIXI.Point.prototype.sub = function(point){
-		this.set(this.x - point.x, this.y - point.y);
-	};
-	
 	var RendererPixi = function(ctx, settings){
-		console.log('renderer.pixi.start', this.settings, arguments);
+		console.log('renderer.construct', this.settings);
 
-		var update = function(){
+		var update = function(dt){
+			//rateLimit.message('renderer.update', 1/dt);
 			this.renderer.render(this.stage);
 		}.bind(this);
 		
@@ -39,7 +23,7 @@
 		ctx.on('update', update);
 		ctx.once('stop', stop);
 		
-		this.assets = new O;
+		this.assets = new O();
 	};
 
 	RendererPixi.prototype.classes = ['engine.component'];
@@ -57,13 +41,13 @@
 		}
 	};
 	
-	RendererPixi.prototype.layer = function(){
+	RendererPixi.prototype.createLayer = function(){
 		return new PIXI.DisplayObjectContainer();
 	};
 	
 	RendererPixi.prototype.createGroup = function(){
 		return new PIXI.DisplayObjectContainer();
-	}
+	};
 	
 	RendererPixi.prototype.getTexture = function(name){
 		var asset = this.assets.get(name);

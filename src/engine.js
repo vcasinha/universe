@@ -11,22 +11,25 @@
 		
 		this.ctx = O.instance('engine.context', settings);
 		console.log("engine.construct Initialize context");
-
-
-        var time_previous = time_current = new Date().getTime();
-        var time_delta = 0;
-        var update = function(dt, step){
+        c = 0;
+        var previous_timestamp;
+        var update = function(current_timestamp, step){
             requestAnimationFrame(update);
-            if(this.isRunning || step){
-                console.log("Running");
-                time_current = new Date().getTime();
-                time_delta = (time_current - time_previous) / 1000;
-                
-				this.ctx.trigger('update', time_delta, time_current);
-                
-                time_previous = time_current;
-            }
 
+            previous_timestamp = previous_timestamp || current_timestamp;
+            delta = (current_timestamp - previous_timestamp) / 1000;
+            previous_timestamp = current_timestamp;
+            
+            if(this.isRunning || step){
+                if(step){
+                    console.log("engine.update.step fps", 1/delta);
+                }
+
+                //rateLimit.message('engine.update', "engine.update.step fps", 1/delta);
+                
+				this.ctx.trigger('update', delta);
+            }
+            
         }.bind(this);
         
         var start = function(){
@@ -36,10 +39,9 @@
         var pause = function(){
 	        this.isRunning = false;
         }.bind(this);
-        
+
         this.ctx.on('start', start);
         this.ctx.on('pause', pause);
-        
         //Setup animation frame
         console.log("engine.construct Setup animation frame");
         requestAnimationFrame(update);
@@ -105,15 +107,6 @@
 	};
 	
 	Engine.prototype.update = function(){
-		requestAnimationFrame(this.updateCallback);
-		this.timeCurrent = new Date().getTime();
-		this.timeDelta = (this.timeCurrent - this.timePrevious) / 1000;
-		if(!this.paused){
-			this.ctx.trigger('update', this.timeDelta);
-			this.ctx.trigger('update.renderer');
-		}
-		
-		this.timePrevious = this.timeCurrent;
 	};
 
 	O.register('engine', Engine);

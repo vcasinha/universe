@@ -11,22 +11,18 @@
         }
 		//console.log('animation.construct', sprite);
 		//Handle events
-		var step = 1 / 1;
-		var time_remaining = 0;
+		var step = 1 / 60;
+		var time_passed = 0;
 		
 		var update = function(dt){
-			if(dt < time_remaining){
-				time_remaining -= dt;
-				return false;
-			}
-			
-			if(this.currentAnimation){
+			time_passed += dt;
+			if(this.currentAnimation && time_passed > 1 / this.currentAnimation.fps){
 				this.currentAnimation.currentFrame++;
 				if(this.currentAnimation.currentFrame > this.currentAnimation.endFrame){
 					this.currentAnimation.currentFrame = this.currentAnimation.startFrame;
 				}
-				time_remaining = 1 / this.currentAnimation.fps;
 				this.sprite.setFrame(this.currentAnimation.currentFrame);
+				time_passed = 0;
 			}
 		}.bind(this);
 		
@@ -35,7 +31,7 @@
 		this.sprite.setFrame(0);
 	};
 	
-	Animation.prototype.classes = ['engine.component'];
+	Animation.prototype.classes = ['stage.component'];
 	
 	Animation.prototype.add = function(animation){
 		if(typeof animation !== 'object'){
@@ -57,7 +53,7 @@
 			throw("");
 		}
 		
-		this.currentAnimation = this.animations[name];
+		this.currentAnimation = O.extend({}, this.animations[name]);
 		this.currentAnimation.currentFrame = this.currentAnimation.startFrame;
 		//console.log("animation.play", this.currentAnimation);
 	};

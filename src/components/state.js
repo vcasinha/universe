@@ -12,31 +12,27 @@
 		var current_step = 0;
 		
 		var update = function(dt){
-			if(dt < current_step){
-				current_step -= dt;
-				return false;
-			}
-
-// 			console.log("state update");
+			//rateLimit.message('behavior.update', 1/dt);
 			this.update(dt);
-			current_step = step;
-			
 		}.bind(this);
 		
 		var init = function(){
-			console.log("component.state.init", this.settings);
+			//console.log("component.state.init", this.settings);
 			for(var i in this.settings.states){
 				var state = this.settings.states[i];
+
+				console.log('behavior.init', i, state);
 				this.addState(state, 'sm.' + state);
 			}
 		}.bind(this);
 		
 		var stop = function(){
-			this.ctx.off('update', update);
+			this.stop();
 		}.bind(this);
 		
 		var start = function(){
-			this.start(this.settings.boot || 'boot');
+			var state = this.settings.boot || 'boot';
+			this.start(state);
 		}.bind(this);
 		
 		this.ctx.once('init', init);
@@ -58,22 +54,21 @@
 	
 	StateMachine.prototype.stop = function(){
 		if(this.currentState){
-			console.log('state.stop', this.currentState.name);
-			this.currentState.instance.stop();
+			console.log('behavior.stop', this.currentState.name);
+			this.currentState.instance.trigger('stop');
 		}
 		
 		return this;
 	};
 	
-	StateMachine.prototype.start = function(state_name){
+	StateMachine.prototype.start = function(state_id){
 		if(this.currentState){
 			this.stop();
 		}
 		
-		console.log('state.start', state_name);
-		var state = this.states[state_name];
-		var state_instance = O.instance(state, this.ctx);
-		
+		var state_name = this.states[state_id];
+		var state_instance = O.instance(state_name, this.ctx);
+		console.log('behavior.start', state_id, '(' + state_name + ')');
 		if(state_instance === undefined){
 			throw("Undefined state " + state_name);
 		}
@@ -82,13 +77,14 @@
 			name: state_name,
 			instance: state_instance
 		};
-		
-		this.currentState.instance.start();
+
+		this.currentState.instance.trigger('start');
 	}
 	
 	StateMachine.prototype.update = function(dt){
 		if(this.currentState){
-			this.currentState.instance.update(dt);
+			//console.log('behavior.update', dt);
+			this.currentState.instance.trigger('update', dt);
 		}
 	};
 	

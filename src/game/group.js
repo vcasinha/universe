@@ -1,30 +1,12 @@
 (function(){
-    function uuid(){
-        return parseInt(new Date().getTime()).toString(16) + 
-            parseInt(new Date().getTime() * Math.random()).toString(16);
-    }
+    var StageObject = function(){
 
-    var StageObject = function(parent, user_settings){
-        this.ctx = parent.ctx;
-        this.stage = parent.ctx.stage;
-
+        this.stage = stage;
         this.settings = O.extend({id: uuid()}, this.defaultSettings, user_settings);
-
-        //console.log("stage.object.construct", this.settings.id);
 
         this.renderContainer = O.i('engine.layer');
         this.children = {};
-
-        this.position = O.i('vec2');
-
-        var update = function(dt){
-            for(var id in this.objects){
-                var child = this.children[id];
-                child.trigger('addon.update', dt);
-                child.trigger('update', dt);
-                //child.update(dt);
-            }
-        }.bind(this);
+        this.position = O.instance('vec2');
 
         var position_update = function(position){
             //console.log('stage.object position.update', position);
@@ -36,23 +18,25 @@
             this.rotation = angle;
         }.bind(this);
 
+        var update = function(dt){
+            for(var id in this.objects){
+                this.objects[id].trigger('addon.update', dt);
+                this.objects[id].trigger('update', dt);
+                this.objects[id].update(dt);
+            }
+        }.bind(this);
+
         this.on('update', update);
         this.on('position.update', position_update);
         this.on('rotation.update', rotation_update);
     };
     
-    StageObject.prototype.classes = ['stage.component'];
+    StageObject.prototype.classes = ['o.events'];
     StageObject.prototype.defaultSettings = {};
     
     StageObject.prototype.add = function(child){
-        this.children[child.settings.id] = child;
+        this.children[child.id] = child;
         this.renderContainer.addChild(child.renderContainer);
-
-        return this;
-    };
-
-    StageObject.prototype.attach = function(addon){
-        addon.attach(ctx);
 
         return this;
     };
@@ -67,11 +51,8 @@
         return this;
     };
 
-    StageObject.prototype.defaultSettings = {
-        position:{
-            x: 0,
-            y: 0
-        }
+    StageObject.prototype.getID = function(){
+        return this.settings.id;
     };
     
     O.register('stage.object', StageObject);

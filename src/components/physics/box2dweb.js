@@ -1,11 +1,14 @@
 (function(){
 	var Physics = function(){
 		var init = function(settings){
+			console.log("physics.construct", this.settings);
+
 			this.dtRemaining = 0;
 			this.stepAmount = this.settings.stepAmount || 1 / 60;
 			this.scale = this.settings.scale || 100;
 			
-			var gravity = new b2Vec2(this.settings.gravity.x || 0.0, this.settings.gravity.y || 10.0);
+			var gravity = new b2Vec2(this.settings.gravity.x, this.settings.gravity.y);
+			
 			this.world = new b2World(gravity, true);
 			//this.debug();
 			
@@ -28,7 +31,7 @@
 	
 	Physics.prototype.update = function(dt){
 		this.dtRemaining += dt;
-		while (this.dtRemaining > this.stepAmount) {
+		while (this.dtRemaining > this.stepAmount){
 			this.dtRemaining -= this.stepAmount;
 			this.world.Step(this.stepAmount,
 			8, // velocity iterations
@@ -68,5 +71,11 @@
 		return O.instance('physics.body.box2d', this.world, settings);
 	}
 	
+	Physics.prototype.settingsDefault = {
+		gravity: {
+			x: 0,
+			y: 0.1
+		}
+	};
 	O.register('component.physics.box2d', Physics);
 })();

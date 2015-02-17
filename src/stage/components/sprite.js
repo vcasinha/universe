@@ -1,34 +1,23 @@
 (function(){
-	var StageSprite = function(parent, user_settings, stage){
+	var StageSprite = function(parent, user_settings){
 		this.frames = [];
-		this.renderer = stage.ctx.renderer;
+		this.renderer = this.ctx.renderer;
 		
 		this.currentFrame = null;
 		this.parent = parent;
 		
-		var default_settings = {
-			x: 0,
-			y: 0,
-			anchor: {
-				x: 0.5, 
-				y:0.5
-			}
-		};
-		
-		this.settings = O.extend({}, default_settings, user_settings);
-		
-		console.log('stage.sprite.construct', this.id, this.settings, this.ctx);
-		
-		//Create sprite
-		this.sprite = this.renderer.getSprite();
-		this.renderer.add(this.sprite);
-		
-		this.sprite.anchor.set(this.settings.anchor.x, this.settings.anchor.y);
-		this.sprite.position.set(this.parent.x, this.parent.y);
-		this.scale = this.sprite.scale;
-		
-		this.sprite.interactive = true;
-		this.sprite.buttonMode = true;
+        //console.log('addon.start', this.id, this.settings);
+        
+        //Create sprite
+        this.sprite = this.renderer.getSprite();
+        this.parent.renderContainer.addChild(this.sprite);
+        
+        this.sprite.anchor.set(this.settings.anchor.x, this.settings.anchor.y);
+        this.sprite.position.set(this.parent.x, this.parent.y);
+        this.scale = this.sprite.scale;
+        
+        this.sprite.interactive = true;
+        this.sprite.buttonMode = true;
 
         var position_update = function(position){
             this.sprite.position.set(position.x, position.y);
@@ -41,7 +30,8 @@
         parent.on('rotation.update', rotation_update);
     };
     
-    StageSprite.prototype.classes = ['engine.component'];
+    StageSprite.prototype.classes = ['stage.component'];
+
 	StageSprite.prototype.loadFrame = function(name, index){
 		index = index || this.frames.length;
 		var texture = this.renderer.getTexture(name);
@@ -80,7 +70,7 @@
     
     StageSprite.prototype.loadAnimation = function(settings){
 		var frames = this.renderer.getAnimationTextures(settings);
-		console.log("sprite.loadAnimation", frames.length);
+		//console.log("sprite.loadAnimation", frames.length);
 		for(var i in frames){
 			this.frames.push(frames[i]);
 		}
@@ -88,5 +78,14 @@
 		return frames;
     };
     
+    StageSprite.prototype.defaultSettings = {
+        x: 0,
+        y: 0,
+        anchor: {
+            x: 0.5, 
+            y:0.5
+        }
+    };
+
 	O.register('addon.sprite', StageSprite);
 })();

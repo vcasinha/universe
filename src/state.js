@@ -1,13 +1,12 @@
 (function(){
 	var State = function(ctx){
+        this.ctx = ctx;
 		this.stage = ctx.stage;
-		this.stage.reset();		
+		this.stage.reset();
+
 	};
 	
-	State.prototype.classes = ['engine.component']
-	
-	State.prototype.update = function(){
-	};
-	
+	State.prototype.classes = ['engine.component', 'o.events'];
+
 	O.register('engine.state', State);
 })();
