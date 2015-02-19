@@ -1,47 +1,49 @@
 (function(){
 	var Engine = function(settings){
-        this.isRunning = false;
-        this.stepping = false;
-		this.isPaused = false;
+		console.log("engine.construct", settings);
+		
+        var isRunning = false;
+		var isPaused = false;
 		this.components = [];
 
         this.settings = settings = O.extend(true, {}, this.settings_default, settings);
 
         //console.log("engine.construct", settings);
 		
-		this.ctx = O.instance('engine.context', settings);
-		console.log("engine.construct Initialize context");
+		var ctx = this.ctx = O.instance('engine.context', settings);
+		
         c = 0;
         var previous_timestamp;
-        var update = function(current_timestamp, step){
+        var update = function(current_timestamp){
             requestAnimationFrame(update);
+
+			//rateLimit.message('engine.update', "engine.update.step fps", 1/delta);
 
             previous_timestamp = previous_timestamp || current_timestamp;
             delta = (current_timestamp - previous_timestamp) / 1000;
             previous_timestamp = current_timestamp;
             
-            if(this.isRunning || step){
-                if(step){
-                    console.log("engine.update.step fps", 1/delta);
-                }
-
-                //rateLimit.message('engine.update', "engine.update.step fps", 1/delta);
-                
-				this.ctx.trigger('update', delta);
+            if(isRunning){
+				ctx.trigger('engine.tick', delta);
             }
-            
-        }.bind(this);
+        };
         
-        var start = function(){
-	        this.isRunning = true;
-        }.bind(this);
+        this.ctx.on('start', function(){
+	        isRunning = true;
+        });
         
-        var pause = function(){
-	        this.isRunning = false;
-        }.bind(this);
-
-        this.ctx.on('start', start);
-        this.ctx.on('pause', pause);
+        this.ctx.on('engine.pause', function(){
+	        isRunning = !isRunning;
+        }.bind(this));
+        
+        this.ctx.on('engine.step', function(){
+	        console.log('engine.step');
+	        ctx.trigger('engine.tick', 1/60);
+        });
+        
+        this.ctx.on('engine.tick', function(dt){
+	       ctx.trigger('engine.update', dt); 
+        });
         //Setup animation frame
         console.log("engine.construct Setup animation frame");
         requestAnimationFrame(update);

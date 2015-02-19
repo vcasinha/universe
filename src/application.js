@@ -3,12 +3,13 @@
 	};
 	
 	Application.prototype.init = function(settings){
+		var stage_element = $('#' + settings.element);
+
 		this.engine = O.instance('engine', settings);
 		this.engine.init();
 		
 		this.ctx = this.engine.ctx;
 		
-		var stage_element = $('#stage');
 		stage_element.append(this.engine.getElement());
 		
 		var fs = function(){

@@ -9,13 +9,12 @@
 				padding: 0;
 			}
 			
-			#stage{
+			.stage{
+				width: 600px;
 				margin-top: 10px;
 				margin-right: auto;
 				margin-left: auto;
 				border: 2px solid #444444;
-				width: 800px;
-				height: 600px;
 			}
 		</style>
 		<!-- Libraries -->
@@ -23,7 +22,7 @@
 		<script src="../lib/jquery.binarytransport.js"></script>
 		
 		<!-- Game Libraries -->
-		<script src="../lib/pixi.dev.js"></script>
+		<script src="../lib/pixi.min.js"></script>
 		<script src="../lib/howler.min.js"></script>
 		<script src="../lib/Box2dWeb-2.1.a.3.min.js"></script>
 		
@@ -43,8 +42,10 @@
         <script src="../../src/misc.js"></script>
 		
 		<!-- Stage -->
-        <script src="../../src/stage/component.js"></script>
+		<script src="../../src/stage/addon.js"></script>
 		<script src="../../src/stage/object.js"></script>
+		<script src="../../src/stage/entity.js"></script>
+		<script src="../../src/stage/tilesmap.js"></script>
 		<script src="../../src/stage/components/sprite.js"></script>
 		<script src="../../src/stage/components/animation.js"></script>
         <script src="../../src/stage/components/physics.js"></script>
@@ -53,6 +54,7 @@
 		<script src="../../src/components/renderer/pixi.js"></script>
 		<script src="../../src/components/physics/box2dweb.js"></script>
 		<script src="../../src/components/physics/box2dweb.body.js"></script>
+		<script src="../../src/components/loader/tmx.js"></script>
 		<script src="../../src/components/loader.js"></script>
 		<script src="../../src/components/audio/howl.js"></script>
 		<script src="../../src/components/state.js"></script>
@@ -66,13 +68,15 @@
 		
 		<!-- Game Objects -->
 		<script src="app/entities/bird.js"></script>
+		<script src="app/entities/world.js"></script>
 	</head>
 	<body>
-		<div id="stage"></div>
+		<div id="stage1" class="stage"></div>
 		<script>
 			window.onload = function(){
 				var RateLimit = function(){
 					this.context = {};
+					this.step = 0.5;
 				};
 
 				RateLimit.prototype.message = function(name){
@@ -87,15 +91,32 @@
 
 					var time_current =  new Date().getTime() / 1000;
 					var delta = time_current - limiter;
-					if(delta > 1/step){
+					if(delta > 1 / this.step){
 						args.unshift('ratelimit.' + name + '(' + step + 's)');
 						console.log.apply(console, args);
 						this.context[name] = time_current;
 					}
 				};
+				
+				RateLimit.prototype.call = function(name, callback){
+					var limiter = this.context[name];
+					
+					if(limiter === undefined){
+						limiter = this.context[name] = new Date().getTime() / 1000;
+					}
+
+					var time_current =  new Date().getTime() / 1000;
+					var delta = time_current - limiter;
+					if(delta > 1 / this.step){
+						this.context[name] = time_current;
+						callback();
+					}
+				};
 
 				rateLimit = new RateLimit();
+				
 				var settings = {
+                    element: 'stage1',
 					components: {
 						loader: 'component.loader',
 						renderer: 'component.renderer.pixi',
@@ -111,7 +132,7 @@
 					},
 					renderer: {
 						width: 800,
-						height: 600,
+						height: 200,
 						background: 0xffffff,
 						interactive: true,
 						renderer: {
@@ -119,20 +140,18 @@
 						}
 					},
 					physics: {
-						scale: 20,
+						scale: 100,
 						gravity: {
 							x: 0.0,
-							y: 0.0
+							y: 0.5
 						}
 					}
 				};
 
-				window.app = O.instance('engine.application');
-				app.init(settings);
-				app.start();
-				//app.togglePause();
-				
-				window.app = app;
+				window.app1 = O.instance('engine.application');
+				app1.init(settings);
+				app1.start();
+				//app1.togglePause();
 			}
 		</script>
 	</body>

@@ -39,20 +39,37 @@
 	};
 	
 	Loader.prototype.processQueue = function(){
-		this.queue.forEach(function(asset){
-			//console.log("loader.load", asset.name, asset.location);
+		console.log(this.queue);
+		
+		for(var i = 0;i<this.queue.length;i++){
+			var asset = this.queue[i];
+			asset.loaded = false;
+			console.log("loader.load", asset.name, asset.location);
 			
 			this.ctx.once(asset.type + '.loaded.' + asset.name, function(asset){
-				//console.log("loader.load.asset.loaded", asset.name, asset);
-				this.removeFromQueue(asset);
-				//console.log("Queue", this.queue);
-				if(this.queue.length === 0){
-					
+				console.log("loader.load.asset.loaded", asset.name, asset);
+				
+				asset.loaded = true;
+				var loaded = 0;
+				
+				for(var i = 0;i < this.queue.length;i++){
+					var asset = this.queue[i];
+					if(asset.loaded === true){
+						
+						loaded++;;
+					}
+				}
+				
+				if(loaded === this.queue.length){
+					console.log('assets.loaded', this.queue);
 					this.ctx.trigger('assets.loaded');
 				}
 			}.bind(this));
 			
 			switch(asset.type){
+				case 'json':
+					this.handleJSON(asset);
+				break;
 				case 'image':
 					this.handlePIXI(asset);
 				break;
@@ -63,7 +80,7 @@
 					throw "loader.load.invalid asset type " + asset.type;
 				break;
 			}
-		}.bind(this));
+		}
 
 		return this;
 	};
@@ -96,8 +113,21 @@
 		this.ctx.audio.load(asset);
 	};
 
+	Loader.prototype.handleJSON = function(asset){
+		$.get(asset.location, function(data){
+			console.log("DATA Loaded", data);
+			window.jsondata = data;
+			O.i('parser.tmx', data);
+			
+			this.ctx.trigger(asset.type + '.loaded.' + asset.name, asset);
+		}.bind(this));
+		//console.log("loader.handleAudio", asset.name);
+		this.ctx.audio.load(asset);
+	};
+
 	Loader.prototype.removeFromQueue = function(asset){
-		this.queue.splice(this.queue.indexOf(asset), 1);
+		var ix = this.queue.indexOf(asset);
+		this.queue.splice(ix, 1);
 		return this;
 	};
 	

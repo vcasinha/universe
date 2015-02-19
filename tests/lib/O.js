@@ -28,10 +28,10 @@
     O.prototype.instance = O.i = function(name, args){
         var Constructor = this.get(name);
         if(typeof Constructor !== 'function'){
-            throw "(O.instance) " + name + " is not loaded";
+            return undefined;
         }
 
-        //console.log("instance", name);
+        //console.log("o.instance", name);
 
         //Handle arguments as an ARRAY or load all arguments
         if(args === undefined || args.constructor !== Array){
@@ -40,8 +40,8 @@
         }
 
         var instance = new (function(f, args) {
-                    var params = [f].concat(args);
-                    return f.bind.apply(f, params);
+	        		args.unshift(f);
+                    return f.bind.apply(f, args);
                 }(Constructor, args));
 
         return instance;
@@ -65,26 +65,30 @@
             if(o.prototype.__classes__){
                 for(var i in o.prototype.__classes__){
                     var class_name = o.prototype.__classes__[i];
-                    //console.log('get.parent', class_name, level);
                     if(class_name in classes === false){
                         classes.push(class_name);
-                        var c = get_parents(O.get(class_name), level + 1);
-                        //console.log(name, c);
-                        for(var e in c){
-                            if(c[e] in classes === false){
-                                classes.push(c[e]);
-                            }
+                        var parents = get_parents(O.get(class_name), level + 1);
+                        
+                        for(var a in parents){
+	                        var parent = parents[a];
+	                        if(classes.indexOf(parent) < 0){
+		                        classes.push(parent);
+	                        }
                         }
+                        //console.log("classes.children", name, class_name, classes);
                     }
                 }
             }
+            
             return classes;
         }
 
         //console.log('O.register', name);
-        var parent_name;
-        var classes = Constructor.prototype.__classes__ = get_parents(Constructor, 1);
-        //console.log(name, classes);
+        var parents = get_parents(Constructor, 1);
+		//console.log("O.register", name, parents.slice(0));
+        var parent_name = parents[0] || false;
+        var classes = Constructor.prototype.__classes__ = parents;
+        
 
         // console.log('o.register.1', classes);
         
@@ -93,18 +97,14 @@
         //console.log("o.createClass", Constructor, prototype, classes);
         
         var VanillaConstructor = Constructor;
-
         Constructor = function(){
             var args = arguments;
-
-            //console.log(Constructor.prototype.__name__ + '.Construct', this.__classes__);
-            //console.log("VanillaConstructor.construct", args);
-            //O.unique(classes);
-            //console.log('object.classes', name, classes);
             for(var i = 0;i < classes.length;i++){
-                //console.log('apply', i);
                 var class_name = classes[classes.length - i - 1];
-                O.get(class_name).apply(this, args);
+                if(class_name !== name){
+	            	O.get(class_name).apply(this, args);    
+	            	//console.log('apply', name, class_name);
+                }
             }
 
             VanillaConstructor.apply(this, args);
@@ -124,9 +124,15 @@
             O.extend(Constructor.prototype, Object.create(parent.prototype));
         }
 
+		for(var i in classes){
+			var parent_name = classes[i];
+			var parent_class = O.get(parent_name);
+			O.extend(Constructor.prototype, parent_class.prototype);
+		}
+
+
         //console.log("O.createClass", Constructor.__name__);
         Constructor.prototype = this.extend(Constructor.prototype, VanillaConstructor.prototype);
-        Constructor.prototype.classes = classes;
 
         //Register within O
         //console.log("o.register.store", name, constructor);

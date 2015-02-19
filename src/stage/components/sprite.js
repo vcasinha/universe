@@ -5,32 +5,24 @@
 		
 		this.currentFrame = null;
 		this.parent = parent;
-		
-        //console.log('addon.start', this.id, this.settings);
+        //console.log('addon.start', parent);
         
         //Create sprite
         this.sprite = this.renderer.getSprite();
         this.parent.renderContainer.addChild(this.sprite);
         
         this.sprite.anchor.set(this.settings.anchor.x, this.settings.anchor.y);
-        this.sprite.position.set(this.parent.x, this.parent.y);
         this.scale = this.sprite.scale;
         
         this.sprite.interactive = true;
         this.sprite.buttonMode = true;
-
-        var position_update = function(position){
-            this.sprite.position.set(position.x, position.y);
-        }.bind(this);
-        parent.on('position.update', position_update);
-
-        var rotation_update = function(angle){
-            this.sprite.rotation = angle;
-        }.bind(this);
-        parent.on('rotation.update', rotation_update);
+        
+        parent.on('sprite.frame', function(frame){
+	        this.setFrame(frame);
+        }.bind(this))
     };
     
-    StageSprite.prototype.classes = ['stage.component'];
+    StageSprite.prototype.classes = ['stage.addon'];
 
 	StageSprite.prototype.loadFrame = function(name, index){
 		index = index || this.frames.length;
@@ -42,6 +34,10 @@
 		}
 		
 		return this;
+	};
+	
+	StageSprite.prototype.onClick = function(callback){
+		this.sprite.click = callback	
 	};
 	
 	StageSprite.prototype.nextFrame = function(){
@@ -84,7 +80,8 @@
         anchor: {
             x: 0.5, 
             y:0.5
-        }
+        },
+        stage: false
     };
 
 	O.register('addon.sprite', StageSprite);

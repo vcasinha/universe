@@ -1,27 +1,28 @@
 (function(PIXI){
 	var RendererPixi = function(ctx, settings){
 		console.log('renderer.construct', this.settings);
+		var renderer;
+		var stage;
 
 		var update = function(dt){
 			//rateLimit.message('renderer.update', 1/dt);
-			this.renderer.render(this.stage);
+			
 		}.bind(this);
 		
-		var init = function(){
+		ctx.once('init', function(){
+			console.log('renderer.pixi init start');
 			// create an new instance of a pixi stage
-			this.stage = new PIXI.Stage(settings.background || 0x000000, settings.interactive);
+			stage = this.stage = new PIXI.Stage(settings.background || 0x000000, settings.interactive);
 	
 			// create a renderer instance.
-			this.renderer = PIXI.autoDetectRenderer(settings.width, settings.height, settings.renderer);
-		}.bind(this);
+			renderer = this.renderer = PIXI.autoDetectRenderer(settings.width, settings.height, settings.renderer);
+			console.log('renderer.pixi init done', settings.renderer);
+		}.bind(this));
 		
-		var stop = function(){
-			ctx.off('update', update);
-		}.bind(this);
-		
-		ctx.once('init', init);
-		ctx.on('update', update);
-		ctx.once('stop', stop);
+		ctx.on('engine.update', function(){
+			renderer.render(stage);
+			this.trigger('renderer.update');
+		});
 		
 		this.assets = new O();
 	};
@@ -29,6 +30,9 @@
 	RendererPixi.prototype.classes = ['engine.component'];
 	
 	RendererPixi.prototype.getElement = function(){
+		if(this.renderer === undefined){
+			return undefined;
+		}
 		return this.renderer.view;
 	};
 	

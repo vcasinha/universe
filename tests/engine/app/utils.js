@@ -1,3 +1,8 @@
+function uuid(){
+    return parseInt(new Date().getTime()).toString(16) + 
+        parseInt(new Date().getTime() * Math.random()).toString(16);
+}
+
 function lerp(from, to, amount){
 	return to - (to - from) * Math.abs(amount);
 }

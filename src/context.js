@@ -12,6 +12,7 @@
 	};
 	
 	Context.prototype.classes = ['o.events'];
+	
 	Context.prototype.loadComponent = function(name, object_name){
 		var settings = this.settings[name] || {};
 		//console.log('context.loadComponent', name, object_name, settings);

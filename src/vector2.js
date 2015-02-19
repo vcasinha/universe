@@ -11,6 +11,10 @@
     Vector2.prototype.classes = [];
 
     Vector2.prototype.set = function(vec){
+	    if(typeof vec !== 'object'){
+		    return;
+	    }
+	    
         this.x = vec.x || 0;
         this.y = vec.y || 0;
     };
@@ -30,6 +34,10 @@
     };
 
     Vector2.prototype.compare = function(vec){
+	    if(typeof vec !== 'object'){
+		    return;
+	    }
+	    
         if(vec.x != this.x || vec.y != this.y){
             return false;
         }

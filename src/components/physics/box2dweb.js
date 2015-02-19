@@ -1,6 +1,6 @@
 (function(){
-	var Physics = function(){
-		var init = function(settings){
+	var Physics = function(){		
+		this.ctx.once('init', function(settings){
 			console.log("physics.construct", this.settings);
 
 			this.dtRemaining = 0;
@@ -12,34 +12,20 @@
 			this.world = new b2World(gravity, true);
 			//this.debug();
 			
-		}.bind(this);
-
-		var stop = function(){
-			this.ctx.off('update', update);
-		}.bind(this);
+		}.bind(this));
 		
-		var update = function(dt){
-			this.update(dt);
-		}.bind(this);
-		
-		this.ctx.once('init', init);
-		this.ctx.on('update', update);
+		this.ctx.on('engine.update', function(dt){
+			this.world.Step(this.stepAmount,
+				8, // velocity iterations
+				3); // position iterations
+			
+			//rateLimit.message('physics.update');
+			this.trigger('physics.update');
+		}.bind(this));
 		this.ctx.once('stop', stop);
 	};
 	
 	Physics.prototype.classes = ['engine.component', 'o.events'];
-	
-	Physics.prototype.update = function(dt){
-		this.dtRemaining += dt;
-		while (this.dtRemaining > this.stepAmount){
-			this.dtRemaining -= this.stepAmount;
-			this.world.Step(this.stepAmount,
-			8, // velocity iterations
-			3); // position iterations
-		} 
-
-		this.trigger('physics.update');
-	};
 	
 	Physics.prototype.debug = function(){
 		this.debugDraw = new b2DebugDraw();
@@ -68,7 +54,7 @@
 	}
 	
 	Physics.prototype.createBody = function(settings){
-		return O.instance('physics.body.box2d', this.world, settings);
+		return O.instance('physics.rigidbody.box2d', this.ctx, settings);
 	}
 	
 	Physics.prototype.settingsDefault = {
