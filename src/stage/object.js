@@ -1,41 +1,64 @@
 (function(){
-    var BaseObject = function(parent, user_settings){
-        this.stage = parent.ctx.stage;
-        this.ctx = parent.ctx;
-        this.parent = parent;
-        this.settings = O.extend({}, this.defaultSettings, user_settings);
-        
-        this.settings.id = this.settings.id || uuid();
-        
-        //console.log('object.construct', this.settings.id);
+    var default_settings = {
 
-        this.children = [];
-        
-        //console.log(arguments);
-		this.parent.add(this);
     };
 
-    BaseObject.prototype.classes = ['o.events'];
-
-    BaseObject.prototype.add = function(child){
-        this.children.push(child);
-
-        return this;
-    };
-
-    BaseObject.prototype.remove = function(child){
-	    var index = this.children.indexOf(child);
+    var StageObject = function(){
+	    Unit.apply(this);
+	    //console.log('object.construct');
 	    
-	    if(index > -1){
-		    array.splice(index, 1);
-	    }
+	    var self = this;
+	    this.type = 'stage.object';
+	    
+	    this.renderObject = new PIXI.DisplayObjectContainer();
         
-        return this;
+        this.on('check.renderobject', function(unit){
+	        if(unit.renderObject !== undefined){
+		        //console.log('Object has render object', unit.renderObject);
+		        self.renderParent = unit;
+		        self.renderParent.renderObject.addChild(self.renderObject);
+		        console.log('render.parent.connected', unit.id);
+	        }
+        });
+        
+        this.on('connect', function(unit){
+	        if(self.ctx === undefined){
+		        self.ctx = this.findByID('context');
+		        if(self.ctx !== undefined){
+			        self.connected = true;
+			        console.log('object.connected', self.id);
+			        self.trigger('check.renderobject', unit);
+			        self.trigger('connected');
+		        }
+	        }
+	        else if(self.renderParent === undefined){
+				self.trigger('check.renderobject', unit);
+	        }
+        });
+        
+        this.on('disconnect', function(unit){
+	        if(unit === self.renderParent){
+		        console.log('render.lost', self.id);
+		        self.renderParent.renderObject.removeChild(self.renderObject);
+				self.renderParent = undefined;
+	        }
+        });
+        
+        this.on('alone', function(){
+	        console.log("alone", self.id);
+	        self.connected = false;
+			self.ctx = undefined;
+        });
     };
 
-    BaseObject.prototype.defaultSettings = {
+    StageObject.prototype.init = function(settings){
+		
+		this.settings = O.extend({}, default_settings, settings);
 
     };
-    
-    O.register('stage.object', BaseObject);
+
+	var Unit = O.get('universe.unit');
+    O.create(StageObject, Unit);
+
+    O.set('stage.object', StageObject);
 })();

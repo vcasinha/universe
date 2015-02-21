@@ -1,27 +1,45 @@
 (function(){
-	
-	var Context = function(settings){
-		this.settings = settings;
-		this.components = {
-			
-		};
+    var default_settings = {
+    };
+
+    var Context = function(){
+        console.log('universe.context.construct');
+        
+		O.get('universe.unit').apply(this);
+		this.id = 'context';
+    };
+    
+    O.create(Context, 'universe.unit');
+    
+    Context.prototype.init = function(settings){
+        console.log('universe.context.init');
+        this.settings = O.extend({}, default_settings, settings);
+
+        this.initComponents();
+
+        return this;
+    };
+
+    Context.prototype.initComponents = function(){
+        console.log('universe.context.initComponents');
+        for(var name in this.settings){
+            var component_settings = this.settings[name];
+            this[name] = this.initComponent(name, component_settings);
+        }
+
+        return this;
+    };
+
+    Context.prototype.initComponent = function(name, settings){
+        console.log('universe.context.initComponent', name, settings);
+
+		var component = O(settings.component);
+		this.connect(component);
 		
-		for(var i in settings.components){
-			this.loadComponent(i, settings.components[i]);
-		}
-	};
-	
-	Context.prototype.classes = ['o.events'];
-	
-	Context.prototype.loadComponent = function(name, object_name){
-		var settings = this.settings[name] || {};
-		//console.log('context.loadComponent', name, object_name, settings);
-		
-		var component = O.instance(object_name, this, settings);
-		this.components[name] = this[name] = component;
+		component.init(settings);
 		
 		return component;
-	}
-	
-	O.register('engine.context', Context);
+    }
+
+    O.set('universe.context', Context);
 })(O);
