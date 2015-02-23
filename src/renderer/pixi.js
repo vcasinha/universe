@@ -1,4 +1,6 @@
 (function(){
+    "use strict";
+    
     var default_settings = {
 
     };
@@ -6,9 +8,11 @@
     var RendererPIXI = function(){
         console.log('renderer.pixi.construct');
         
+        this.id = 'renderer';
+        this.type = 'component';
+        
         O.get('universe.unit').apply(this);
         
-        this.id = 'renderer';
         this.fps = new PIXI.Text("FPS 0", {font:"12px Monaco", fill:"#ffffff"});
         this.fps.position.set(0, 0);
         this.counter = 0;

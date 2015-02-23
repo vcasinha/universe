@@ -1,12 +1,13 @@
 (function(){
+    "use strict";
+    
     var default_settings = {
     };
 
 	var counter = 0;
 
     var Unit = function(){
-	    counter++;
-	    this.id = '#' + counter;
+	    this.id = this.id || 'unit#' + counter++;
 	    this.parent;
 	    this.connections = [];
 	    this.channels = {};
@@ -134,6 +135,10 @@
 		return message;
 	};
 
+	Unit.prototype.resetChannel = function(channel_name){
+		delete this.channels[channel_name];
+	};
+
 	Unit.prototype.findByID = function(id){
 		var found = undefined;
 	    var message = {
@@ -163,7 +168,7 @@
     Unit.prototype.connect = function(unit){
 	    //console.log("Unit.connect", this.id, unit.id);
 	    
-	    if(this.connections.indexOf(unit) >= 0){
+	    if(unit === this || this.connections.indexOf(unit) >= 0){
 		    return this;
 	    }
 	    

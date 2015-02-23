@@ -1,12 +1,14 @@
 (function(){
+    "use strict";
     var default_settings = {
 
     };
 
     var Engine = function(settings){
-		O.get('universe.unit').apply(this);
-        
         this.id = 'engine';
+        this.type = 'component';
+        
+		O.get('universe.unit').apply(this);
         
         console.log('universe.construct');
 
@@ -25,7 +27,7 @@
             //rateLimit.message('engine.update', "engine.update.step fps", 1/delta);
 
             previous_timestamp = previous_timestamp || current_timestamp;
-            delta = (current_timestamp - previous_timestamp) / 1000;
+            var delta = (current_timestamp - previous_timestamp) / 1000;
             previous_timestamp = current_timestamp;
             
             
@@ -37,8 +39,6 @@
         console.log('engine.construct request animation frame');
         requestAnimationFrame(update);
     };
-
-	O.create(Engine, 'universe.unit');
 
     Engine.prototype.pause = true;
 
@@ -60,6 +60,8 @@
     Engine.prototype.start = function(){
         this.pause = false;
     };
+
+	O.create(Engine, 'universe.unit');
 
     O.set('universe', Engine);
 })();

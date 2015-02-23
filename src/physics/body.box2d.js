@@ -1,4 +1,5 @@
 (function(){
+	"use strict";
 	var default_settings = {
 		scale: 100,
 		position: {
@@ -30,9 +31,15 @@
 	var Body = function (settings){
 		var self = this;
 		
-		Entity.apply(this);
+		this.link = {
+			physics: 'physics',
+			renderer: 'renderer'
+		};
 		
-		this.id = 'body';
+		this.id = this.id || 'rigidbody';
+		this.type = this.type || 'rigidbody';
+		
+		O.exec('universe.entity', this);
 		
 		this.settings = O.extend({}, default_settings, settings);
 		//console.log('body.construct', this.settings);
@@ -50,7 +57,6 @@
 				debug_shape.beginFill(0x006600);
 				debug_shape.lineStyle(1, 0x000000);
 				debug_shape.drawCircle(0, 0, settings.radius);
-				
 			break;
 			case 'box':
 				debug_shape.beginFill(0x006600);
@@ -69,23 +75,23 @@
             self.body.SetLinearVelocity(new b2Vec2(velocity.x, velocity.y));
         });
 		
-		this.on('ready', function(){
-			self.scale = self.ctx.physics.scale;
+		this.on('connected', function(){
+			self.scale = self.physics.scale;
 			
-			console.log('Body ready (Scale)', self.scale);
-			self.world = self.ctx.physics.world;
-			self.settings.scale = self.ctx.physics.settings.scale || 100;
+			//console.log('Body ready (Scale)', self.scale);
+			self.world = self.physics.world;
+			self.settings.scale = self.physics.settings.scale || 100;
 			//console.log("rigidbody.construct", this.settings);
 			
 			self.createBody();
 	        
-	        self.ctx.renderer.physics_debug.addChild(debug_shape);
+	        self.renderer.physics_debug.addChild(debug_shape);
 	        
 	        if(self.settings.type === 'static'){
 		        return false;
 	        }
 	        
-	        this.ctx.physics.on('physics.update', function(){
+	        this.physics.on('physics.update', function(){
 		        var velocity = O('vector2', self.body.GetLinearVelocity());
 		        velocity.multiply(self.settings.scale);
 		        self.trigger('rigidbody.velocity.update', velocity);
@@ -105,9 +111,6 @@
 	        });
 	    });
 	};
- 
-	var Entity = O.get('universe.entity');
-	O.create(Body, Entity);
 	
 	Body.prototype.createBody = function(){
 		//console.log('createBody', this.settings);
@@ -167,6 +170,8 @@
     Body.prototype.applyForce = function(force){
 	    this.body.ApplyForce(force, this.body.GetWorldCenter());
     };
+	
+	O.create(Body, 'universe.entity');
 	
 	O.set('physics.body.box2d', Body);
 })();

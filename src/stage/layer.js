@@ -1,4 +1,6 @@
 (function(){
+    "use strict";
+    
     var default_settings = {
 
     };
@@ -7,30 +9,25 @@
 	    O.exec('stage.object', this);
 	    
 	    var self = this;
-	    this.type = 'Layer';
-	    	    
-        console.log('layer.construct');
-        
-        this.on('connected', function(){
-			var debugShape = new PIXI.Graphics();
-			debugShape.lineStyle (2 , 0x000000,  1);
-			debugShape.beginFill(0x003399);
-			debugShape.drawCircle(0, 0, 10);
-			debugShape.position.set(100, 100);
-			
-			this.renderObject.addChild(debugShape);
-			
-	        this.ctx.stage.on('stage.tick', function(delta){
-				self.trigger('layer.tick');
-			});
-        });
+	    
+	    this.type = 'layer';
     };
 
     Layer.prototype.init = function(settings){
-		
 		this.settings = O.extend({}, default_settings, settings);
-
     };
+
+	Layer.prototype.setAlpha = function(alpha){
+		this.renderObject.alpha = alpha;
+	};
+	
+	Layer.prototype.setScale = function(x, y){
+		this.renderObject.scale.set(x, y);
+	};
+
+	Layer.prototype.setMask = function(mask){
+		this.renderObject.mask = mask;
+	};
 
     O.create(Layer, 'stage.object');
 

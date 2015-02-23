@@ -40,7 +40,7 @@
 		
 		var func = this.get(name);
 		func.apply(context, args);
-		console.log("Call", name, func);
+		//console.log("Call", name, func);
 		
 		return this;
 	};
@@ -52,9 +52,11 @@
             Extension = function(){};
         }
         else if(typeof Extension === 'string'){
-            Extension = this.get(Extension);
+	        var extension_name = Extension;
+            Extension = this.get(extension_name);
             if(Extension === undefined){
-	            console.error('O.create Extension (' + Extension + ') is invalid')
+	            console.error('O.create Extension not loaded', extension_name, Constructor);
+	            throw("STOP");
             }
         }
 

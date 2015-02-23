@@ -1,4 +1,6 @@
 (function(){
+    "use strict";
+    
     var Engine = O.get('universe');
 
     var Application = function(){

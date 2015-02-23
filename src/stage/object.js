@@ -1,10 +1,17 @@
 (function(){
+    "use strict";
+    
     var default_settings = {
 
     };
 
     var StageObject = function(){
-	    Unit.apply(this);
+	    this.link = {
+		    ctx: 'context',
+		    stage: 'stage'
+	    };
+	    
+	    O.exec('universe.entity', this);
 	    //console.log('object.construct');
 	    
 	    var self = this;
@@ -12,53 +19,28 @@
 	    
 	    this.renderObject = new PIXI.DisplayObjectContainer();
         
-        this.on('check.renderobject', function(unit){
-	        if(unit.renderObject !== undefined){
-		        //console.log('Object has render object', unit.renderObject);
-		        self.renderParent = unit;
-		        self.renderParent.renderObject.addChild(self.renderObject);
-		        console.log('render.parent.connected', unit.id);
-	        }
-        });
-        
-        this.on('connect', function(unit){
-	        if(self.ctx === undefined){
-		        self.ctx = this.findByID('context');
-		        if(self.ctx !== undefined){
-			        self.connected = true;
-			        console.log('object.connected', self.id);
-			        self.trigger('check.renderobject', unit);
-			        self.trigger('connected');
+        this.on('connected', function(unit){
+	        if(self.renderParent === undefined){
+		        if(unit.renderObject !== undefined){
+			        //console.log('Render parent', this.id, unit.id);
+			        self.renderParent = unit;
+			        self.renderParent.renderObject.addChild(self.renderObject);
+		        }
+		        else{
+			        console.error('not suitable render parent', this.id, unit.id);
 		        }
 	        }
-	        else if(self.renderParent === undefined){
-				self.trigger('check.renderobject', unit);
+	        else{
+		        //console.log('Already have a Render parent', this.id, unit.id);
 	        }
-        });
-        
-        this.on('disconnect', function(unit){
-	        if(unit === self.renderParent){
-		        console.log('render.lost', self.id);
-		        self.renderParent.renderObject.removeChild(self.renderObject);
-				self.renderParent = undefined;
-	        }
-        });
-        
-        this.on('alone', function(){
-	        console.log("alone", self.id);
-	        self.connected = false;
-			self.ctx = undefined;
         });
     };
 
     StageObject.prototype.init = function(settings){
-		
 		this.settings = O.extend({}, default_settings, settings);
-
     };
 
-	var Unit = O.get('universe.unit');
-    O.create(StageObject, Unit);
+    O.create(StageObject, 'universe.entity');
 
     O.set('stage.object', StageObject);
 })();

@@ -1,117 +1,63 @@
 (function(){
+	"use strict";
+	
     var default_settings = {
 
     };
 
     var Scene = function(){
+	    this.id = 'game.scene';
+	    this.type = 'scene';
+	    
 	    O.exec('stage.layer', this);
+	    
 	    var self = this;
-	    this.type = 'Scene';
 	    
 	    
-	    
-        console.log('layer.construct');
-        
-        this.on('connected', function(){
+        //console.log('Scene.construct');
 
-			//Box
-			var wall = O('game.object', {
-				position: {
-					x: 200, 
-					y: 200
-				},
+        this.on('connected', function(){
+	        console.log('Scene connect');
+	        
+	        //Textures
+			var circle = function(radius, color){
+				var circle = new PIXI.Graphics();
+				circle.lineStyle (2 , 0x000000,  1);
+				circle.beginFill(color || 0x003399);
+				circle.drawCircle(0, 0, radius || 10);
+				return circle.generateTexture();
+			};
+			
+			var box = function(width, height, color){
+				var graphic = new PIXI.Graphics();
+				graphic.lineStyle (2 , 0x000000,  1);
+				graphic.beginFill(color || 0x003399);
+				graphic.drawRect(0, 0, width, height);
+				return graphic.generateTexture();
+			};
+
+			//Hero
+			this.hero = O('game.object', {
+				id: 'hero',
+				position: O('vector2', {x: 100, y: 100}),
 		        body: {
-			        type: 'static',
-		            shape:'box', 
-		            friction: 0.5, 
-		            density: 5,
-		            restitution: 0.3,
-		            width: 100,
-		            height: 100
+		            shape:'circle', 
+		            radius: 7, 
+		            friction: 1, 
+		            density: 3,
+		            restitution: 0.5
+		        },
+		        sprite: {
+			        anchor: {
+				        x: 0.5,
+				        y: 0.5
+			        },
+			        texture: circle(7, 0xffffff)
 		        }
 			});
-			wall.connect(this);
-			
-			var wall = O('game.object', {
-				position: {
-					x: 500, 
-					y: 250
-				},
-		        body: {
-			        type: 'static',
-		            shape:'box', 
-		            friction: 0.5, 
-		            density: 5,
-		            restitution: 0.3,
-		            width: 100,
-		            height: 100
-		        }
-			});
-			wall.connect(this);
-			
-			//Top
-			var wall = O('game.object', {
-				position: O('vector2', {x: app.width/2, y: 0 }),
-		        body: {
-			        type: 'static',
-		            shape:'box', 
-		            friction: 0.5, 
-		            density: 5,
-		            restitution: 0.3,
-		            width: app.width,
-		            height: 5
-		        }
-			});
-			wall.connect(this);
-			
-			//Bottom
-			var wall = O('game.object', {
-				position: O('vector2', {x: app.width/2, y: 400 }),
-		        body: {
-			        type: 'static',
-		            shape:'box', 
-		            friction: 0.5, 
-		            density: 5,
-		            restitution: 0.3,
-		            width: app.width,
-		            height: 2
-		        }
-			});
-			wall.connect(this);
-			
-			var wall = O('game.object', {
-				position: O('vector2', {x: 0, y: app.height/2 }),
-		        body: {
-			        type: 'static',
-		            shape:'box', 
-		            friction: 0.5, 
-		            density: 5,
-		            restitution: 0.7,
-		            width:  2,
-		            height: app.height
-		        }
-			});
-			wall.connect(this);
-			
-			var wall = O('game.object', {
-				position: O('vector2', {x: app.width, y: app.height/2 }),
-		        body: {
-			        type: 'static',
-		            shape:'box', 
-		            friction: 0.5, 
-		            density: 5,
-		            restitution: 0.7,
-		            width: 2,
-		            height: app.height
-		        }
-			});
-			wall.connect(this);
-			
-			var circle = new PIXI.Graphics();
-			circle.lineStyle (2 , 0x000000,  1);
-			circle.beginFill(0x003399);
-			circle.drawCircle(0, 0, 10);
-			
+				
+			this.hero.connect(this);
+				
 			for(var i=0;i < 10;i++){
 				window.bird = O('game.object', {
 					position: O('vector2', {x: Math.random() * 400, y: Math.random() * 400 }),
@@ -127,48 +73,34 @@
 					        x: 0.5,
 					        y: 0.5
 				        },
-				        texture: circle.generateTexture()
+				        texture: circle(10)
 			        }
 				});
 				bird.connect(this);
 			}
-	
-			var box = new PIXI.Text("Testing this out!", {font:"12px Monaco", fill:"red"});
-			
-			var box = new PIXI.Graphics();
-			box.lineStyle (2 , 0x000000,  1);
-			box.beginFill(0x003399);
-			box.drawRect(0, 0, 80, 15);
 		
+			var text = new PIXI.Text("Testing this out!", {font:"12px Monaco", fill:"red"}).generateTexture();
 			
 			var t = O('game.object', {
-				position: O('vector2', {x: 250, y:60 }),
+				position: O('vector2', {x: 100 + Math.random() * 600, y: 20 + Math.random() * 300 }),
 		    	 body: {
 		            shape:'box', 
 		            friction: 0.5, 
 		            density: 5,
 		            restitution: 0.5,
-		            width: box.width,
-		            height: box.height
+		            width: 100,
+		            height: 20
 		        },
 		        sprite: {
 			        anchor: {
 				        x: 0.5,
 				        y: 0.5
 			        },
-			        texture: box.generateTexture()
+			        texture: box(100, 20,0xffffff)
 		        }
 			});
 			t.connect(this);
-
-
         });
-    };
-
-    Scene.prototype.init = function(settings){
-		
-		this.settings = O.extend({}, default_settings, settings);
-
     };
 
     O.create(Scene, 'stage.layer');

@@ -1,12 +1,16 @@
 (function(){
+    "use strict";
+    
     var default_settings = {
     };
 
     var Context = function(){
+	    this.id = 'context';
+	    this.type = 'component';
         console.log('universe.context.construct');
         
 		O.get('universe.unit').apply(this);
-		this.id = 'context';
+		
     };
     
     O.create(Context, 'universe.unit');
