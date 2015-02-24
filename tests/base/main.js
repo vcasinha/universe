@@ -24,7 +24,7 @@
 	            component: 'universe.physics.box2d',
 	            gravity: {
 		            x: 0,
-		            y: 2
+		            y: 3
 	            },
 	            scale: 100
             }
@@ -177,9 +177,9 @@
 	}, 5000);
 */
 
-/*
+
 	//Input
-	var mass = scene1.hero.body.body.GetMass();
+	var mass = scene1.hero.rigidBody.body.GetMass();
 	
 	var listener = new window.keypress.Listener();
 	var my_combos = listener.register_many([
@@ -189,7 +189,7 @@
 	        "on_keydown"    : function() {
 		        var current_time = new Date().getTime() / 1000;
 		        if(this.jumping === undefined || current_time - this.jumping > 1){
-			        this.body.applyImpulse({x: 0, y: -mass});
+			        this.rigidBody.applyImpulse({x: 0, y: -mass * 2});
 			        this.jumping = current_time;
 		        }
 	        },
@@ -202,7 +202,7 @@
 	        "keys"          : "left",
 	        "is_exclusive"  : true,
 	        "on_keydown"    : function() {
-	            this.body.applyImpulse({x: -mass * 0.5, y: 0});
+	            this.rigidBody.applyImpulse({x: -mass * 0.2, y: 0});
 	        },
 	        "on_keyup"      : function(e) {
 	            //console.log("And now you've released one of the keys.");
@@ -213,7 +213,7 @@
 	        "keys"          : "right",
 	        "is_exclusive"  : true,
 	        "on_keydown"    : function() {
-	            this.body.applyImpulse({x: mass * 0.5, y: 0});
+	            this.rigidBody.applyImpulse({x: mass * 0.2, y: 0});
 	        },
 	        "on_keyup"      : function(e) {
 	            //console.log("And now you've released one of the keys.");
@@ -221,6 +221,6 @@
 	        "this"          : scene1.hero
 	    },
 	]);
-*/
+
 })();
 

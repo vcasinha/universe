@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <h1>Testing</h1>
+        <script src="../lib/o.js"></script>
+        <script src="../../src/vector2.js"></script>
+        <script src="../../src/unit.js"></script>
+        <script>
+            var TestObject = function(){
+                this.value = 0;
+            };
+
+            TestObject.prototype = {};
+
+            TestObject.prototype.update = function(delta){
+                this.value += delta;
+                this.name = 'blabla';
+            };
+
+            var Updater = function(){
+                this.container = [];
+            };
+
+            Updater.prototype.length = function(){
+                return this.container.length;
+            };
+
+            Updater.prototype.add = function(object){
+                this.container.push(object);
+            };
+
+            Updater.prototype.update = function(dt){
+                for(var i = 0;i < this.container.length;i++){
+                    var object = this.container[i];
+                    object.update(dt);
+                }
+            };
+
+            var root = new Updater();
+            //var root = O('universe.unit');
+
+            function timestamp(){
+                return (new Date().getTime()) / 1000;
+            }
+
+            var container = [];
+            var sumTime = 0;
+            var previousTime = timestamp();
+            var count = 0;
+            var update = function(){
+                count++;
+                requestAnimationFrame(update);
+                currentTime = timestamp();
+                delta = currentTime - previousTime;
+                previousTime = currentTime;
+                sumTime += delta;
+
+                var beforeUpdate = timestamp();
+
+                root.update(delta);
+                
+                var afterUpdate = timestamp();
+                var deltaUpdate = (afterUpdate - beforeUpdate);
+
+                if(sumTime >= 1){
+                    sumTime = 0;
+                    console.log("update", count, Math.floor(deltaUpdate * 100000)/100, root.length()/1000 + 'K');
+                    count = 0;
+                }
+            }
+
+            for(var i = 0;i < 500000;i++){
+                var obj = new TestObject();
+                root.add(obj);
+            }
+
+            requestAnimationFrame(update);
+        </script>
+    </body>
+</html>

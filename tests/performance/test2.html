@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <h1>Testing</h1>
+        <script src="../lib/o.js"></script>
+        <script src="../../src/vector2.js"></script>
+        <script src="../../src/unit.js"></script>
+        <script>
+            var arr = ['a', 'b', 'c'];
+
+            Array.observe(arr, function(changes) {
+              console.log(changes);
+            });
+
+            arr[1] = 'B';
+            // [{type: 'update', object: <arr>, name: '1', oldValue: 'b'}]
+
+            arr[3] = 'd';
+            // [{type: 'splice', object: <arr>, index: 3, removed: [], addedCount: 1}]
+
+            arr.splice(1, 2, 'beta', 'gamma', 'delta');
+            // [{type: 'splice', object: <arr>, index: 1, removed: ['B', 'c', 'd'], addedCount: 3}]
+        </script>
+    </body>
+</html>

@@ -11,26 +11,26 @@
 		this.position = O('vector2', settings.position);
 		this.rotation = 0;
 		
-		
 		this.id = this.id || settings.id || parseInt(Math.random() * 99999999).toString(16);
-		
+		http://www.designboom.com/art/cal-redback-photo-manipulaton-human-nature-02-23-2015/
 		var tick = function(){
 			if(self.target){
 				//console.log("Target");
 				var impulse = O('vector2', self.target);
 				impulse.subtract(self.sprite.position)
 					.divide(self.ctx.physics.scale)
-					.multiply(self.body.body.GetMass());
+					.multiply(self.rigidBody.body.GetMass() * 0.5);
 
-				self.body.applyImpulse(impulse);
+				self.rigidBody.applyImpulse(impulse);
 			}
 		};
 		
 		this.on('connected', function(){
 			this.stage.on('stage.tick', tick);
-			if(self.body){
+			if(self.rigidBody){
 				//console.log('Connect body');
-				self.body.connect(self);
+				self.rigidBody.connect(self);
+				//self.rigidBody.distanceJoint({x: this.position.x + 30, y: this.position.y + 30});
 			}
 			//console.log('bird.ready');
 		});
@@ -60,8 +60,8 @@
 		//Physics
 		if(typeof settings.body === 'object'){
 			settings.body.position = self.position;
-			self.body = O('physics.body.box2d', settings.body);
-			self.body.on('rigidbody.update', function(position, rotation){
+			self.rigidBody = O('physics.body.box2d', settings.body);
+			self.rigidBody.on('rigidbody.update', function(position, rotation){
 				self.sprite.position.set(position.x, position.y);
 				self.sprite.rotation = rotation;
 			});

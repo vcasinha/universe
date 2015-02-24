@@ -11,10 +11,10 @@
 	window.b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 	window.b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 	window.b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
-
 	
 	var Physics = function(){
 		this.id = 'physics';
+		this.type = 'component';
 		this.$parent.apply(this);
 	};
 	
@@ -54,6 +54,10 @@
 		this.world.SetDebugDraw(this.debugDraw);
 	};
 	
+	Physics.prototype.getGroundBody = function(){
+		return this.world.GetGroundBody();
+	};
+
 	Physics.prototype.getGravity = function(){
 		return this.world.GetGravity();
 	};
@@ -67,7 +71,7 @@
 		
 		this.world.SetContactListener(listener);
 	}
-	
+
 	Physics.prototype.createBody = function(settings){
 		return O.instance('physics.rigidbody.box2d', this.ctx, settings);
 	}

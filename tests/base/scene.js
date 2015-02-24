@@ -22,7 +22,7 @@
 	        //Textures
 			var circle = function(radius, color){
 				var circle = new PIXI.Graphics();
-				circle.lineStyle (2 , 0x000000,  1);
+				circle.lineStyle (1 , 0x000000,  1);
 				circle.beginFill(color || 0x003399);
 				circle.drawCircle(0, 0, radius || 10);
 				return circle.generateTexture();
@@ -58,14 +58,14 @@
 				
 			this.hero.connect(this);
 				
-			for(var i=0;i < 10;i++){
+			for(var i=0;i < 30;i++){
 				window.bird = O('game.object', {
 					position: O('vector2', {x: Math.random() * 400, y: Math.random() * 400 }),
 			        body: {
 			            shape:'circle', 
 			            radius: 10, 
 			            friction: 0.5, 
-			            density: 5,
+			            density: 3,
 			            restitution: 0.5
 			        },
 			        sprite: {
@@ -73,7 +73,7 @@
 					        x: 0.5,
 					        y: 0.5
 				        },
-				        texture: circle(10)
+				        texture: circle(10, 0xeecc44)
 			        }
 				});
 				bird.connect(this);
@@ -85,9 +85,9 @@
 				position: O('vector2', {x: 100 + Math.random() * 600, y: 20 + Math.random() * 300 }),
 		    	 body: {
 		            shape:'box', 
-		            friction: 0.5, 
+		            friction: 0.2, 
 		            density: 5,
-		            restitution: 0.5,
+		            restitution: 0.3,
 		            width: 100,
 		            height: 20
 		        },

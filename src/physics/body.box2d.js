@@ -28,7 +28,7 @@
 		}
 	};
 	
-	var Body = function (settings){
+	var RigidBody = function (settings){
 		var self = this;
 		
 		this.link = {
@@ -36,6 +36,8 @@
 			renderer: 'renderer'
 		};
 		
+		this.joints = [];
+
 		this.id = this.id || 'rigidbody';
 		this.type = this.type || 'rigidbody';
 		
@@ -111,8 +113,8 @@
 	        });
 	    });
 	};
-	
-	Body.prototype.createBody = function(){
+
+	RigidBody.prototype.createBody = function(){
 		//console.log('createBody', this.settings);
 		// Create the definition
 		this.definition = new b2BodyDef();
@@ -163,15 +165,28 @@
 		this.body.CreateFixture(this.fixtureDef);
 	};
 	
-    Body.prototype.applyImpulse = function(impulse){
+	RigidBody.prototype.distanceJoint = function(joint_position){
+		var position = O('vector2', joint_position);
+		position.divide(this.settings.scale);
+
+		var joint_definition = new Box2D.Dynamics.Joints.b2DistanceJointDef();
+		joint_definition.Initialize(this.body, this.physics.getGroundBody(), this.body.GetWorldCenter(), position);
+		var joint = this.world.CreateJoint(joint_definition);
+	};
+
+    RigidBody.prototype.applyImpulse = function(impulse){
 	    this.body.ApplyImpulse(impulse, this.body.GetWorldCenter());
     };
 	
-    Body.prototype.applyForce = function(force){
+    RigidBody.prototype.applyForce = function(force){
 	    this.body.ApplyForce(force, this.body.GetWorldCenter());
     };
 	
-	O.create(Body, 'universe.entity');
+    RigidBody.prototype.getVelocity = function(){
+    	return this.body.GetLinearVelocity();
+    };
+
+	O.create(RigidBody, 'universe.entity');
 	
-	O.set('physics.body.box2d', Body);
+	O.set('physics.body.box2d', RigidBody);
 })();

@@ -102,14 +102,14 @@
 			message.signatures = [];
 		}
 		
-		message.ttl = message.ttl || 0;
+		message.hops = message.hops || 0;
 		//console.log(message);
 		if(message.signatures.indexOf(this) >= 0){
 			return message;
 		}
 		
 		message.signatures.push(this);
-		message.ttl++;
+		message.hops++;
 		
 		//console.log(this.id, message.id);
 		
@@ -125,7 +125,7 @@
 				var answer = unit.broadcast(message);
 				if(answer.response){
 					message.response = answer.response;
-					message.ttl = answer.ttl;
+					message.hops = answer.hops;
 				}
 			}
 		}
@@ -143,7 +143,6 @@
 		var found = undefined;
 	    var message = {
 		    callback: function(unit){
-			    //console.log("findByID", unit, this);
 			    if(this.found){
 				    return true;
 			    }
@@ -162,6 +161,8 @@
 		    throw("Could not find unit with ID " + id);
 	    }
 	    
+        //console.error("findByID", this.id, id, message.hops);
+
 	    return response.found;
 	};
 

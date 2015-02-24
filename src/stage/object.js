@@ -11,12 +11,12 @@
 		    stage: 'stage'
 	    };
 	    
+        this.id = this.id || 'stageobject';
+	    this.type = this.type || 'stage.object';
 	    O.exec('universe.entity', this);
 	    //console.log('object.construct');
 	    
 	    var self = this;
-	    this.type = 'stage.object';
-	    
 	    this.renderObject = new PIXI.DisplayObjectContainer();
         
         this.on('connected', function(unit){
