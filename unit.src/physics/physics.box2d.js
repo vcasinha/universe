@@ -54,6 +54,10 @@
 		this.world.SetDebugDraw(this.debugDraw);
 	};
 	
+	Physics.prototype.update = function(dt){
+		self.world.Step(self.stepAmount, 8, 3);
+	};
+	
 	Physics.prototype.getGroundBody = function(){
 		return this.world.GetGroundBody();
 	};

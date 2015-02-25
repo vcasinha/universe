@@ -2,15 +2,34 @@
     "use strict";
     
     var Vector2 = function(vec){
-        this.copy(vec || {x:0, y:0});
+        if(typeof vec === undefined){
+            vec = {
+	            x:0, 
+	            y:0
+	        };
+        }
+        
+        this.set(vec);
     };
 
-	Vector2.prototype.copy = function(vec){
-		this.x = vec.x || 0;
-		this.y = vec.y || 0;
-	};
+    Vector2.prototype.set = function(vec){
+	    var args = Array.prototype.slice.apply(arguments);
+	    var x = 0;
+	    var y = 0;
+	    
+	    if(args.length >= 2){
+	    	this.x = args.shift();
+			this.x = args.shift();
+	    }
+	    else if(args.length === 1){
+		    var vec = args.shift();
+		    
+		    if(typeof vec === 'object'){
+			    x = vec.x;
+			    y = vec.y;
+		    }
+	    }
 
-    Vector2.prototype.set = function(x, y){
         this.x = x;
         this.y = y;
     };

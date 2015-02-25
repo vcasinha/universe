@@ -1,110 +1,125 @@
 (function(){
-	"use strict";
-	
-	var Entity = function(){
-		//console.log('Entity.constructor');
-		O.exec('universe.unit', this);
-		
-		var self = this;
-		this.connected = false;
-		this._links = {};
-		this.linking = false;
-		
-		//Parameters
+	var Entity = function(settings){
 		this.id = this.id || 'entity';
-		this.type = this.type || 'generic';
-		this.link = this.link || {};
-		this.connection = {
-			connected: false,
-			link:{},
-			linking: false,
-			require: []
-		};
-
+		//console.log('entity.contruct', this.id);
+		this.settings = O.extend({}, this.defaultSettings, settings);
 		
-		//console.log('entity.construct', this.type + '.' + this.id);
-        var node_tick = function(delta){
-			self.trigger('tick');
-		};
-        
-        this.on('connect', function(unit){
-	        if(this.connected === false){
-		        //Link to others
-		        if(this.linking === false){
-			        this.linking = true;
-			        //console.log('attempt connection', this.id, unit.type + '.' + unit.id);
-			        var required_connections = 0;
-			        var linked_connections = 0
-			        for(var ix in this.link){
-				        //console.log('Attempt to link', ix);
-				        if(this[ix] === undefined){
-					        var link = this.findByID(this.link[ix]);
-					        if(link !== undefined){
-						        //console.log('Linking', this.id, link.id);
-						        //Connect directly
-						        if(this.connections.indexOf(link) === -1){
-							        //console.log('Connecting', this.type + '.' + this.id, link.type + '.' + link.id);
-							        this.connect(link);
-						        }
-						        linked_connections++;
-						        this._links[ix] = link;
-						        this[ix] = link;
-					        }
-				        }
-				        else {
-					        linked_connections++;
-				        }
-				        
-				        required_connections++;
-			        }
-			        
-			        //Check if all requirements are met
-			        if(this.connected === false){
-				        if(linked_connections === required_connections){
-					        //console.log('Connected', this.id, this.link);
-					        this.connected = true;
-					        this.trigger('connected', unit);
-				        }
-				        else{
-					        console.log('failed', required_connections, linked_connections);
-					        console.error('failed to connect', this.id, unit.id, this.link, this.links);
-				        }
-			        }
-		        }
-	        }
-	        else{
-		        //console.log('Already connected', this.id, unit.d);
-	        }
-	        this.linking = false;
-        });
-        
-        this.on('disconnect', function(unit){
-	        if(this.connected === true){
-		        console.log('disconnect', unit);
-		        var count = 0;
-		        var links_available = 0
-		        for(var ix in this.link){
-			        var link = this.findByID(this.link[ix]);
-			        if(link !== undefined){
-				        links_available++;
-			        }
-			        else{
-				        delete this[ix];
-			        }
-			        count++;
-		        }
-		        
-		        if(links_available !== count){
-			        console.log('disconnected');
-			        this.trigger('disconnected', unit);
-			        this.trigger('alone', unit);
-			        self.connected = false;
-		        }
-	        }
-        });
+		this.started = false;
+		this.children = [];
+		this.plugins = [];
+		this.renderObject = new PIXI.DisplayObjectContainer();
 	};
 	
-	O.create(Entity, 'universe.unit');
+	Entity.prototype._update = function(dt){
+		if(this.update){
+			this.update(dt);
+		}
+			
+		for(var i = 0;i < this.children.length;i++){
+			var child = this.children[i];
+			child._update(dt);
+		}
+		
+/*
+		for(var i = 0;i < this.plugins.length;i++){
+			var plugin = this.plugins[i];
+			if(plugin.update){
+				plugin.update(dt);
+			}
+		}
+*/
+	};
 	
-	O.set('universe.entity', Entity);
+	Entity.prototype.start = function(){};
+	Entity.prototype.stop = function(){};
+	
+	Entity.prototype._start = function(){
+		//console.log('entity.start', this.id);
+		for(var i = 0;i < this.plugins.length;i++){
+			var plugin = this.plugins[i];
+			if(plugin.start){
+				plugin.start();
+			}
+		}
+		
+		this.start();
+		
+		if(this.logic && this.logic.start){
+			this.logic.start();
+		}
+		
+		for(var i = 0;i < this.children.length;i++){
+			var child = this.children[i];
+			child._start();
+		}
+		this.started = true;
+	};
+	
+	Entity.prototype._stop = function(){
+		for(var i = 0;i < this.children.length;i++){
+			var child = this.children[i];
+			child._stop();
+		}
+		
+		for(var i = 0;i < this.plugins.length;i++){
+			this.plugins[i].stop();
+		}
+		
+		this.stop();
+	};
+	
+	Entity.prototype.getByID = function(id){
+		for(var i = 0;i < this.children.length;i++){
+			var child = this.children[i];
+			if(child.id === id){
+				return child;
+			}
+		}
+	};
+	
+	Entity.prototype.setComponents = function(components){
+		this.components = components;
+		console.log('plugin', this.plugins);
+		for(var i = 0;i < this.plugins.length;i++){
+			
+			var plugin = this.plugins[i];
+			plugin.components = this.components;
+		}
+		
+		for(var i = 0;i < this.children.length;i++){
+			var child = this.children[i];
+			child.setComponents(this.components);
+		}
+	};
+	
+	Entity.prototype.addChild = function(child){
+		//console.log('entity.addChild', child);
+		if(child.parent){
+			child.parent.removeChild(child);
+		}
+		
+		child.parent = this;
+		child.setComponents(this.components);
+		
+		this.children.push(child);
+		this.renderObject.addChild(child.renderObject);
+		if(this.started === true){
+			child._start();
+		}
+	};
+
+	Entity.prototype.removeChild = function(child){
+		for(var i = 0;i < this.children.length;i++){
+			if(child === this.children[i]){
+				child._stop();
+				this.children.splice(i, 1);
+				this.renderObject.removeChild(child.renderObject);
+				child.parent = undefined;
+			}
+		}
+	};
+
+	Entity.prototype.defaultSettings = {};
+
+	O.set('entity', Entity);
 })();

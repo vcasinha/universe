@@ -27,9 +27,6 @@
 		var self = this;
 		
 		this.engine = this.findByID('engine');
-		this.engine.on('engine.tick', function(delta){
-			self.render(delta);
-		});
 		// create an new instance of a pixi stage
 		this.stage = new PIXI.Stage(settings.background || 0x000000);
 	
@@ -47,7 +44,7 @@
 		
     };
 
-	RendererPIXI.prototype.render = function(delta){
+	RendererPIXI.prototype.update = function(delta){
 		this.timer += delta;
 		this.counter++;
 		if(this.timer >= 1){

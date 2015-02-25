@@ -9,8 +9,7 @@
 	    this.type = 'component';
         console.log('universe.context.construct');
         
-		O.get('universe.unit').apply(this);
-		
+		this.$parent.apply(this);		
     };
     
     O.create(Context, 'universe.unit');
@@ -18,7 +17,6 @@
     Context.prototype.init = function(settings){
         console.log('universe.context.init');
         this.settings = O.extend({}, default_settings, settings);
-
         this.initComponents();
 
         return this;
