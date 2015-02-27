@@ -2,19 +2,28 @@
 	var Input = function(settings){
 		this.debug = false;
 		this.click = false;
-		this.id = this.id || settings.id || 'gameObject';
+		this.id = this.id || 'input.plugin';
 		//console.log('object.construct', settings);
 		this.$parent.apply(this, arguments);
-		this.sensor = this.entity.sprite.sprite;
 		
-		if(this.entity.logic){
-			var logic = this.entity.logic;
-			this.sensor.interactive = true;
-			this.sensor.mousedown = this.sensor.touchstart = function(interaction){
+	};
+	
+	Input.prototype.start = function(){
+		var sensor = this.sensor = this.entity.sprite.sprite;
+		var logic = this.entity.logic;
+		
+		console.log('input.start', this.id, logic);
+		if(logic){
+			sensor.interactive = true;
+			sensor.mousedown = sensor.touchstart = function(interaction){
 				logic.exec('mouseDown', interaction);
 			};
 			
-			this.sensor.mouseup = this.sensor.mouseupoutside = function(interaction){
+			sensor.mousemove = function(interaction){
+				logic.exec('mouseMove', interaction);
+			};
+			
+			sensor.mouseup = sensor.mouseupoutside = sensor.touchend = sensor.touchendoutside = function(interaction){
 				logic.exec('mouseUp', interaction);
 			};
 		}

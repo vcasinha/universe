@@ -15,13 +15,13 @@
 			//{type: 'audio', location: '../assets/if.the.stars.were.mine.ogg', id: 'music'},
 			
 		];
+		this.components.assets.onload = function(){
+			engine.components.stage.setScene('main');
+		};
 		this.components.assets.load(assets);
 	};
 	
 	Scene.prototype.update = function(dt){
-		if(this.components.assets.loaded){
-			engine.components.stage.setScene('main');
-		}
 	};
 	
 	O.create(Scene, 'entity');

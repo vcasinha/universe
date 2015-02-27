@@ -2,6 +2,7 @@
 	"use strict";
 	
 	var RigidBody = function(){
+        this.id = this.id || 'rigidBody.plugin';
 		this.$parent.apply(this, arguments);
 		
 		this.require_update = false;

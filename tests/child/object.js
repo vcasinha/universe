@@ -3,7 +3,7 @@
 		this.debug = false;
 		
 		this.id = this.id || settings.id || 'gameObject';
-		//console.log('object.construct', settings);
+		//console.log('object.construct', this.id);
 		this.$parent.apply(this, arguments);
 		this.tags = [].concat(this.tags, this.settings.tags);
 		

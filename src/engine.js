@@ -33,7 +33,7 @@
 		}
 		
 		for(var com_name in this.components){
-			console.log("engine.init Component", com_name, settings);
+			//console.log("engine.init Component", com_name, settings);
 			var component = this.components[com_name];
 			component.init();
 		}
@@ -55,7 +55,6 @@
 		var start_time = (new Date().getTime() / 1000);
 		this.components.physics.update(dt);
 		this.components.stage.update(dt);
-		this.components.logic.update(dt);
 		this.components.renderer.update(dt);
 		var end_time = (new Date().getTime() / 1000);
 		this.components.renderer.updateCost = Math.round((end_time - start_time) * 100000) / 100000;

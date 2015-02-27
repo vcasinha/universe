@@ -40,6 +40,16 @@
         return new Vector2(this);
     };
 
+	Vector2.prototype.length = function(){
+		return Math.sqrt(this.x * this.x + this.y * this.y)
+	};
+
+	Vector2.prototype.normalize = function(){
+		this.divide(this.length());
+		
+		return this;
+	};
+
     Vector2.prototype.compare = function(vec){
 	    if(typeof vec !== 'object'){
 		    return;

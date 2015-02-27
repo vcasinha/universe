@@ -3,9 +3,6 @@
 		this.id = 'scene';
 		this.$parent.apply(this);
 		//console.log('scene.construct', this.settings);
-		
-		this.counter = 0;
-		this.timer = 0;
 	};
 	
 	Scene.prototype.start = function(){
@@ -101,13 +98,17 @@
 		
 		var previous = this.getByID('support');
 		
-		for(var i = 0;i < 6;i++){
+		for(var i = 0;i < 20;i++){
 			var settings = {
 				id: 'ball#' + i,
 				transform: {
 					position: {
-						x: 400 + i * 30, 
-						y: 64 + i * 64
+						x: Math.random() * 800, 
+						y: Math.random() * 400
+					},
+					scale: {
+						x: 0.5,
+						y: 0.5
 					},
 					rotation: 0,
 			        anchor: {
@@ -118,21 +119,21 @@
 				physics: {
 					body: {
 			            shape:'circle', 
-			            radius: 32, 
+			            radius: 16, 
 			            friction: 0.5, 
 			            density: 3,
 			            restitution: 0.8
 			        },
 				},
 		        sprite: {
-			        texture: this.components.assets.get('texture.ball')
+			        texture: 'ball'
 		        },
-		        input: true
 			};
 			
 			var child = O('object', settings);
 			this.addChild(child);
 			
+/*
 			this.addChild(O('object', {
 				id: 'joint' + i,
 				transform: {},
@@ -143,6 +144,7 @@
 					length: 62
 				}
 			}));
+*/
 			
 			previous = child;
 		}
@@ -151,8 +153,8 @@
 			id: 'hero',
 			transform: {
 				position: {
-					x: 300, 
-					y: 50
+					x: 50, 
+					y: 350
 				},
 				rotation: 0,
 		        anchor: {
@@ -164,128 +166,20 @@
 				body: {
 		            shape:'circle', 
 		            radius: 32, 
-		            friction: 0.5, 
+		            friction: 1, 
 		            density: 3,
-		            restitution: 0.8
+		            restitution: 0.1
 		        },
 			},
 	        sprite: {
-		        texture: this.components.assets.texture('ball')
+		        texture: 'ball'
 	        },
 	        input: true,
-	        logic: {
-		        methods: {
-			        mouseDown: function(i){
-				        //this.body.applyImpulse({x: 7.5 - Math.random() * 15, y: -Math.random() * 10});
-				        console.log('mouse down', i.originalEvent.clientX, i.originalEvent.clientY);
-				        var target = O('vector2', {x: i.originalEvent.clientX, y: i.originalEvent.clientY});
-				        this.mouseJoint = O('object', {
-							id: 'joint' + i,
-							transform: {},
-							joint: {
-								type: 'mouse',
-								from: this.entity,
-								target: target
-							},
-							logic: {
-								methods: {
-									update: function(){
-										
-									}
-								}
-							}
-						});
-						
-						this.entity.addChild(this.mouseJoint);
-			        },
-			        mouseUp: function(i){
-				        this.mouseJoint._stop();
-			        },
-			        contactForce: function(other, force){
-						
-				        //this.sprite.sprite.tint = 0xff0000;
-				        if(force > 50){
-					        var volume = force / 1000;
-					        var px = (this.transform.position.x - 400) / 800;
-					        var py = (this.transform.position.y - 200) / 400;
-					        var pz = 0;
-					        
-					        //console.log('contact', force, px, py, pz);
-					        
-					        this.components.audio.play('ball')
-					        	.volume(volume.limit())
-					        	.pos3d(px, py, pz);
-				        }
-				        
-			        },
-			        endContact: function(){
-				        //this.sprite.sprite.tint = 0xffffff;
-			        },
-			        update: function(){
-				        if(!this.jump && this.input.down('W')){
-					        this.jump = true;
-					        console.log('press');
-					        //this.entity.body.applyImpulse(0.1);
-				        }
-				        
-				        if(this.jump && !this.input.down('W')){
-					        this.jump = false;
-					        console.log('depress');
-					        //this.entity.body.applyImpulse(0.1);
-				        }
-			        }
-		        }
-	        }
+	        logic: O.get('controller.ball')
 		};
 		
 		var child = O('object', settings);
 		this.addChild(child);
-	};
-	
-	Scene.prototype.update = function(dt){
-
-/*
-		this.timer += dt;
-		if(this.timer > 0.2){
-			this.timer = 0;
-			this.counter++;
-			
-			var settings = {
-				transform: {
-					position: {
-						x: 395 + Math.random(), 
-						y: -50
-					},
-					rotation: 0,
-			        anchor: {
-				        x: 0.5,
-				        y: 0.5
-			        },
-				},
-				physics: {
-					body: {
-			            shape:'circle', 
-			            radius: 32, 
-			            friction: 0.5, 
-			            density: 3,
-			            restitution: 0.2
-			        },
-				},
-		        sprite: {
-			        texture: PIXI.Texture.fromImage('../assets/ball1.png')
-		        }
-			};
-			
-			var child = O('object', settings);
-			this.addChild(child);
-
-			if(this.counter > 50){
-				var child = this.children[4];
-				this.removeChild(child);
-			}
-		}
-*/
-
 	};
 	
 	O.create(Scene, 'entity');

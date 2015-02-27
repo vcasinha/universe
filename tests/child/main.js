@@ -73,9 +73,6 @@
             },
             input: {
 	            component: 'component.input'
-            },
-            logic: {
-	            component: 'component.logic'
             }
         }
     };

@@ -1,21 +1,19 @@
 (function(){
 	"use strict";
-	
-    var default_settings = {
-
-    };
 
     var Stage = function(){
 	    this.$parent.apply(this, arguments);
-	    console.log('stage.construct');
+	    //console.log('stage.construct');
 	    
 	    var self = this;
         this.currentScene = undefined;
         this.scenes = {};
         this.actions = [];
         this.children = [];
+        this.plugins = [];
         
         this.renderObject = new PIXI.DisplayObjectContainer();
+        window.call_count = 0;
     };
 
 	Stage.prototype.update = function(dt){
@@ -29,11 +27,25 @@
 			}
 		}
 */
-		
+		call_count = 0;
+		//Update children
+/*
 		for(var i = 0;i < this.children.length;i++){
 			var child = this.children[i];
 			if(child.update){
-				child._update(dt);
+				call_count++;
+				child.update(dt);
+				console.log('call', child.id);
+			}
+		}
+*/
+
+		window.avg = call_count;
+		//Update plugins
+		for(var i = 0;i < this.plugins.length;i++){
+			var plugin = this.plugins[i];
+			if(plugin.update){
+				plugin.update(dt);
 			}
 		}
 	};
@@ -41,7 +53,6 @@
 	Stage.prototype.getByID = function(id){
 		for(var i = 0;i < this.children.length;i++){
 			var child = this.children[i];
-			console.log('stage.getByID', id == child.id);
 			if(child.id == id){
 				return child;
 			}
@@ -50,15 +61,35 @@
 
     Stage.prototype.init = function(settings){
 		this.components.renderer.addChild(this.renderObject);
-		this.settings = O.extend({}, default_settings, settings);
+		this.settings = O.extend({}, this.defaultSettings, settings);
 		
-		console.log('stage init', this.settings);
+		//console.log('stage init', this.settings);
+    };
+
+    Stage.prototype.addPlugin = function(plugin){
+    	//console.log('stage.addPlugin', plugin.id);
+		if(this.plugins.indexOf(plugin) !== -1){
+			return;
+		}
+		
+		this.plugins.push(plugin);
+    };
+
+    Stage.prototype.removePlugin = function(plugin){
+	    //console.log('stage.removePlugin', plugin.id);
+		for(var i = 0;i < this.plugins.length;i++){
+			if(this.plugins[i] === plugin){
+				this.plugins.splice(i, 1);
+			}
+		}
     };
 
 	Stage.prototype.addChild = function(child){
-		//console.log('stage.addChild', this.engine);
-		child.setComponents(this.components);
-		this.renderObject.addChild(child.renderObject);
+		//console.log('stage.addChild', child.id);
+		if(this.children.indexOf(child) !== -1){
+			return;
+		}
+		
 		this.children.push(child);
 	};
 
@@ -72,21 +103,25 @@
 	}
 
 	Stage.prototype.setScene = function(index){
+		//console.log('stage.setScene', index);
+		
 		if(this.currentScene){
-			this.currentScene.stop();
+			this.currentScene.destroy();
 			this.removeChild(this.currentScene);
 		}
 		
 		this.currentScene = this.scenes[index];
-		if(this.currentScene){
-			this.addChild(this.currentScene);
+		if(!this.currentScene){
+			return;
 		}
 		
-		this.currentScene._start();
+		this.addChild(this.currentScene);
+		this.renderObject.addChild(this.currentScene.renderObject);
+		this.currentScene.init(this.components);
 	};
 
 	Stage.prototype.addScene = function(index, scene){
-		console.log('stage.addScene', index);
+		//console.log('stage.addScene', index);
 		this.scenes[index] = scene;
 		
 		return scene;
@@ -111,6 +146,9 @@
 		}
 		return this;
 	};
+	
+	Stage.prototype.defaultSettings = {};
+	
 	O.create(Stage, 'component');
 	
     O.set('stage', Stage);

@@ -35,22 +35,24 @@
 		this.handleContact({
 			BeginContact: function(contact){
 				var entityA = contact.GetFixtureA().GetBody().GetUserData();
-				if(entityA.logic){
+				var entityB = contact.GetFixtureB().GetBody().GetUserData();
+				
+				if(entityA.logic && entityB){
 					entityA.logic.exec('beginContact', entityB, contact);
 				}
 				
-				var entityB = contact.GetFixtureB().GetBody().GetUserData();
 				if(entityB.logic){
 					entityB.logic.exec('beginContact', entityA, contact);
 				}
 			},
 			EndContact: function(contact){
 				var entityA = contact.GetFixtureA().GetBody().GetUserData();
+				var entityB = contact.GetFixtureB().GetBody().GetUserData();
+				
 				if(entityA.logic){
 					entityA.logic.exec('endContact', entityB, contact);
 				}
 				
-				var entityB = contact.GetFixtureB().GetBody().GetUserData();
 				if(entityB.logic){
 					entityB.logic.exec('endContact', entityA, contact);
 				}
@@ -93,8 +95,18 @@
 		this.world.SetDebugDraw(this.debugDraw);
 	};
 	
+	Physics.prototype.addJoint = function(joint){
+		this.joints.push(joint);
+	};
+	
 	Physics.prototype.update = function(dt){
 		this.world.Step(this.stepAmount, 8, 3);
+		for(var i = 0;i < this.joints.length;i++){
+			if(this.joints[i].update){
+				this.joints[i].update();
+			}
+		}
+		
 		for(var i = 0;i < this.bodies.length;i++){
 			var body = this.bodies[i];
 			var object = body.GetUserData();
@@ -224,13 +236,15 @@
 				joint_definition.bodyA = settings.to;
 				joint_definition.bodyB = settings.from;
 				joint_definition.target = new b2Vec2(settings.target.x / this.scale, settings.target.y / this.scale);
-				joint_definition.maxForce = 100000;
+				joint_definition.maxForce = settings.maxForce || 100000;
 				joint_definition.collideConnected = settings.collide || true;
 			break;
 		}
 		
+		joint_definition.userData = settings.data || undefined;
+		
 		var joint = this.world.CreateJoint(joint_definition);
-		this.joints.push(joint);
+		//this.joints.push(joint);
 		
 		//console.log('physics.createJoint joint', joint);
 		

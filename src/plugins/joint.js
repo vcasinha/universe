@@ -1,13 +1,6 @@
-(function(){
-	
-    var currentMousePos = { x: -1, y: -1 };
-    $(document).mousemove(function(event) {
-	    
-        currentMousePos.x = event.pageX;
-        currentMousePos.y = event.pageY;
-    });
-	
+(function(){	
 	var Joint = function(){
+		this.id = this.id || 'joint.plugin';
 		this.$parent.apply(this, arguments);
 		
 		//console.log("sprite.construct", this.entity.transform);
@@ -35,7 +28,10 @@
 		console.log('joint.start', joint);
 		
 		this.type = joint.type;
+		
 		this.joint = this.physics.createJoint(joint);
+		this.joint.SetUserData(this.entity);
+		this.physics.addJoint(this);
 	};
 	
 	Joint.prototype.setTarget = function(target){
@@ -44,11 +40,13 @@
 		this.joint.SetTarget(position);
 	};
 	
+/*
 	Joint.prototype.update = function(){
 		if(this.type === 'mouse'){
 			this.setTarget(currentMousePos);
 		}
 	};
+*/
 	
 	Joint.prototype.stop = function(){
 		this.components.physics.removeJoint(this.joint);

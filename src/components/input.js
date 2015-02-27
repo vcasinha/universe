@@ -27,7 +27,7 @@
             this.keys[event.keyCode] = event.keyCode;
         }
         if (this.keysDown[this.keys[event.keyCode]]) return; // Key already down
- 
+
         this.keysDown[this.keys[event.keyCode]] = true;
 /*
         var prevent = game.scene.keydown(this.defaultSettings.keys[event.keyCode], this.down('SHIFT'), this.down('CTRL'), this.down('ALT'));

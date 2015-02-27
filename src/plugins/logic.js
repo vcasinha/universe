@@ -1,7 +1,7 @@
 (function(){
 	var Logic = function(){
+		this.id = this.id || 'logic.plugin';
 		this.$parent.apply(this, arguments);
-		console.log("logic.construct", arguments);
 	};
 	
 	Logic.prototype.exec = function(){
@@ -23,9 +23,16 @@
 			input: this.components.input
 		};
 		
-		this.components.logic.addLogic(this);
+		
+		O.extend(this.context, this.settings.context);
 	};
 	
+	Logic.prototype.update = function(dt){
+		var method = this.settings.methods['update'];
+		if(method && typeof method === 'function'){
+			method.call(this.context, dt);
+		}
+	};
 	O.create(Logic, 'plugin');
 	O.set('plugin.logic', Logic);
 })();

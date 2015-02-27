@@ -9,7 +9,7 @@
 	AssetManager.prototype.load = function(assets){
 		var audio_context = this.components.audio.context;
 		var removeFromQueue = function(asset){
-			console.log("assets.removeFromQueue", asset);
+			//console.log("assets.removeFromQueue", asset);
 			for(var i = 0;i < this.queue.length;i++){
 				if(this.queue[i] === asset){
 					this.queue.splice(i, 1);
@@ -18,6 +18,8 @@
 			
 			if(this.queue.length === 0){
 				this.loaded = true;
+				this.onload.apply();
+				this.onload = undefined;
 			}
 		}.bind(this);
 		
@@ -31,11 +33,11 @@
 			this.queue.push(asset);
 			switch(asset.type){
 				case 'texture':
-					console.log('load texture');
+					//console.log('load texture');
 					var loader = new PIXI.ImageLoader(asset.location);
 					loader.asset = asset;
 					loader.onLoaded = function(){
-						console.log('load texture', this);
+						//console.log('load texture', this);
 						this.asset.data = this.texture;
 						removeFromQueue(this.asset);
 					};
@@ -88,7 +90,7 @@
 	};
 	
 	AssetManager.prototype.onLoad = function(asset){
-		console.log('assets.onload', asset.id);
+		//console.log('assets.onload', asset.id);
 		this.removeFromQueue(asset);
 		if(this.queue.length === 0){
 			this.loaded = true;
